@@ -116,6 +116,45 @@ const productInfoSchema = new Schema<TProductInfo>(
   }
 );
 
+
+const AuthorSchema = new Schema(
+  {
+    name: { type: String },
+    image: { type: String },
+    description: {type: String}
+  },
+  { _id: false }
+);
+
+
+const SpecificationSchema = new Schema(
+  {
+    title: { type: String },
+    Author: { type: AuthorSchema },
+    Publisher: { type: String },
+    edition: { type: String },
+    numberOfPages: { type: Number },
+    country: { type: String },
+    language: { type: String },
+  },
+  { _id: false }
+);
+
+// BookInfo SubSchema
+export const BookInfoSchema = new Schema(
+  {
+    specification: { type: SpecificationSchema },
+    format: {
+      type: String,
+      enum: ["hardcover", "paperback", "ebook", "audiobook"],
+    },
+    genre: [{ type: String }],
+    pages: { type: Number },
+    isbn: { type: String },
+  },
+  { _id: false }
+);
+
 const productSchema = new Schema<TProduct>(
   {
     shopId: {
@@ -142,6 +181,8 @@ const productSchema = new Schema<TProduct>(
       required: [true, "Product type is Required!"],
     },
     productInfo: productInfoSchema,
+    bookInfo: { type: BookInfoSchema },
+
   },
   {
     timestamps: true,

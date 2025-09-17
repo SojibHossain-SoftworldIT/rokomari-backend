@@ -23,6 +23,8 @@ export type TProductInfo = {
   price: number;
   salePrice: number;
   quantity: number;
+  // new
+  size: string;
   sku: string;
   width: string;
   height: string;
@@ -32,6 +34,32 @@ export type TProductInfo = {
   isExternal?: boolean;
   external?: TExternal;
   status: "draft" | "publish" | "low-quantity";
+};
+
+export type TAuthor = {
+  name: string;
+  image: string;
+  description: string;
+}
+
+
+export type TSpecification = {
+  title: string;
+  Author: TAuthor;
+  Publisher: string;
+  edition: string;
+  numberOfPages: number;
+  country: string;
+  language: string;
+};
+
+
+export type TBookInfo = {
+  specification: TSpecification;
+  format?: 'hardcover' | 'paperback' | 'ebook' | 'audiobook';
+  genre?: string[];
+  pages?: number;
+  isbn?: string;
 };
 
 export type TProduct = {
@@ -44,4 +72,5 @@ export type TProduct = {
   productType: 'simple' | 'variable';
   productInfo: TProductInfo;
   deletedImages?: string[];
+  bookInfo?: TBookInfo;
 };
