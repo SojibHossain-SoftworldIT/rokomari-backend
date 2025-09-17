@@ -79,6 +79,7 @@ const productInfoSchema = new Schema<TProductInfo>(
       type: Number,
       required: [true, "Quantity is Required!"],
     },
+    size: {type: String},
     sku: {
       type: String,
       required: [true, "sku is Required!"],
@@ -105,6 +106,7 @@ const productInfoSchema = new Schema<TProductInfo>(
       type: Boolean,
     },
     external: externalSchema,
+    discount : {type: Number, default: 0},
     status: {
       type: String,
       enum: ["draft", "publish", "low-quantity"],

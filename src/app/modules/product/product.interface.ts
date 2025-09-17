@@ -23,7 +23,6 @@ export type TProductInfo = {
   price: number;
   salePrice: number;
   quantity: number;
-  // new
   size: string;
   sku: string;
   width: string;
@@ -33,7 +32,8 @@ export type TProductInfo = {
   digital?: string;
   isExternal?: boolean;
   external?: TExternal;
-  status: "draft" | "publish" | "low-quantity";
+  discount?: number;
+  status: 'draft' | 'publish' | 'low-quantity';
 };
 
 export type TAuthor = {
