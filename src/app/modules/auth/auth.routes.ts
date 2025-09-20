@@ -1,6 +1,6 @@
 import express from "express";
-import { AuthController } from "./auth.controller";
 import validateRequest from "../../middlewares/validateRequest";
+import { AuthController } from "./auth.controller";
 import { AuthValidations } from "./auth.validations";
 
 const router = express.Router();
@@ -26,5 +26,8 @@ router.post(
   validateRequest(AuthValidations.loginUserUsingProvider),
   AuthController.loginUserUsingProvider
 );
+
+// Refresh access token using refresh token
+router.post("/refresh-token", AuthController.refreshToken);
 
 export const AuthRoutes = router;
