@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateProductZodSchema = exports.createProductZodSchema = void 0;
+exports.updateProductZodSchema = exports.bookInfoZodSchema = exports.createProductZodSchema = void 0;
 const zod_1 = require("zod");
 // brandAndCategories validation
 const brandAndCategoryZodSchema = zod_1.z.object({
@@ -77,21 +77,43 @@ exports.createProductZodSchema = zod_1.z.object({
     }),
     productInfo: productInfoZodSchema,
 });
+const authorZodSchema = zod_1.z.object({
+    name: zod_1.z.string(),
+    image: zod_1.z.string().url('Invalid author image URL!').optional(),
+    description: zod_1.z.string().optional(),
+});
+const specificationZodSchema = zod_1.z.object({
+    title: zod_1.z.string(),
+    author: authorZodSchema,
+    publisher: zod_1.z.string(),
+    edition: zod_1.z.string().optional(),
+    numberOfPages: zod_1.z.number().optional(),
+    country: zod_1.z.string().optional(),
+    language: zod_1.z.string().optional(),
+});
+exports.bookInfoZodSchema = zod_1.z.object({
+    specification: specificationZodSchema,
+    format: zod_1.z.enum(['hardcover', 'paperback', 'ebook', 'audiobook']).optional(),
+    genre: zod_1.z.array(zod_1.z.string()).optional(),
+    pages: zod_1.z.number().optional(),
+    isbn: zod_1.z.string().optional(),
+});
 exports.updateProductZodSchema = zod_1.z.object({
     shopId: zod_1.z.string().optional(),
-    featuredImg: zod_1.z.string().url("Invalid feature image URL!").optional(),
+    featuredImg: zod_1.z.string().url('Invalid feature image URL!').optional(),
     gallery: zod_1.z
-        .array(zod_1.z.string().url("Invalid gallery image URL!"))
-        .min(1, { message: "At least one gallery image is required!" })
+        .array(zod_1.z.string().url('Invalid gallery image URL!'))
+        .min(1, { message: 'At least one gallery image is required!' })
         .optional(),
     video: zod_1.z.string().optional(),
     brandAndCategories: brandAndCategoryZodSchema.optional(),
     description: descriptionZodSchema.optional(),
     productType: zod_1.z
-        .enum(["simple", "variable"], {
+        .enum(['simple', 'variable'], {
         message: "Product type must be 'simple' or 'variable'",
     })
         .optional(),
     productInfo: productInfoZodSchema.optional(),
     deletedImages: zod_1.z.array(zod_1.z.string()).optional(),
+    bookInfo: exports.bookInfoZodSchema.optional(),
 });

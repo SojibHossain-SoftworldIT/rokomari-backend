@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProductModel = void 0;
+exports.ProductModel = exports.BookInfoSchema = void 0;
 const mongoose_1 = require("mongoose");
 const brandAndCategorySchema = new mongoose_1.Schema({
     brand: {
@@ -64,6 +64,7 @@ const productInfoSchema = new mongoose_1.Schema({
         type: Number,
         required: [true, "Quantity is Required!"],
     },
+    size: { type: String },
     sku: {
         type: String,
         required: [true, "sku is Required!"],
@@ -90,6 +91,7 @@ const productInfoSchema = new mongoose_1.Schema({
         type: Boolean,
     },
     external: externalSchema,
+    discount: { type: Number, default: 0 },
     status: {
         type: String,
         enum: ["draft", "publish", "low-quantity"],
@@ -98,6 +100,31 @@ const productInfoSchema = new mongoose_1.Schema({
 }, {
     timestamps: true,
 });
+const AuthorSchema = new mongoose_1.Schema({
+    name: { type: String },
+    image: { type: String },
+    description: { type: String }
+}, { _id: false });
+const SpecificationSchema = new mongoose_1.Schema({
+    title: { type: String },
+    Author: { type: AuthorSchema },
+    Publisher: { type: String },
+    edition: { type: String },
+    numberOfPages: { type: Number },
+    country: { type: String },
+    language: { type: String },
+}, { _id: false });
+// BookInfo SubSchema
+exports.BookInfoSchema = new mongoose_1.Schema({
+    specification: { type: SpecificationSchema },
+    format: {
+        type: String,
+        enum: ["hardcover", "paperback", "ebook", "audiobook"],
+    },
+    genre: [{ type: String }],
+    pages: { type: Number },
+    isbn: { type: String },
+}, { _id: false });
 const productSchema = new mongoose_1.Schema({
     shopId: {
         type: mongoose_1.Schema.Types.ObjectId,
@@ -123,6 +150,7 @@ const productSchema = new mongoose_1.Schema({
         required: [true, "Product type is Required!"],
     },
     productInfo: productInfoSchema,
+    bookInfo: { type: exports.BookInfoSchema },
 }, {
     timestamps: true,
 });
