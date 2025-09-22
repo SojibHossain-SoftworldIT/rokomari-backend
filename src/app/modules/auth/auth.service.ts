@@ -1,29 +1,39 @@
+import bcrypt from "bcrypt";
+import httpStatus from "http-status";
+import jwt from "jsonwebtoken";
 import config from "../../config";
+import AppError from "../../errors/handleAppError";
 import { UserModel } from "../user/user.model";
 import { TAuth, TExternalProviderAuth } from "./auth.interface";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import AppError from "../../errors/handleAppError";
-import httpStatus from "http-status";
 
-//register a user in database
+// Helper to generate tokens
+const generateTokens = (payload: object) => {
+  const accessToken = jwt.sign(payload, config.jwt_access_secret as string, {
+    expiresIn: "15m", // shorter-lived
+  });
+
+  const refreshToken = jwt.sign(payload, config.jwt_refresh_secret as string, {
+    expiresIn: "7d", // longer-lived
+  });
+
+  return { accessToken, refreshToken };
+};
+
+// Register a user in database
 const registerUserOnDB = async (payload: TAuth) => {
   const result = await UserModel.create(payload);
   return result;
 };
 
-//login an user with credentials
+// Login with credentials
 const loginUserFromDB = async (payload: TAuth) => {
-  const isUserExists = await UserModel.findOne({
-    email: payload?.email,
-  });
+  const isUserExists = await UserModel.findOne({ email: payload?.email });
 
-  // Check if a user exists with the provided email
   if (!isUserExists) {
     throw Error("User does not exists!");
   }
 
-  //check password
+  // check password
   const isPasswordMatched = await bcrypt.compare(
     payload?.password,
     isUserExists?.password
@@ -39,79 +49,69 @@ const loginUserFromDB = async (payload: TAuth) => {
     { new: true }
   );
 
-  //generating token
   const jwtPayload = {
     email: isUserExists?.email,
     role: isUserExists?.role,
   };
 
-  //token
-  const token = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
-    expiresIn: "24h",
-  });
+  const { accessToken, refreshToken } = generateTokens(jwtPayload);
 
-  const userObject = {
-    user: user,
-    accessToken: token,
-  };
-
-  return userObject;
+  return { user, accessToken, refreshToken };
 };
 
-//login an user with credentials
+// Login with provider
 const loginUserUsingProviderFromDB = async (payload: TExternalProviderAuth) => {
-  const isUserExists = await UserModel.findOne({
-    email: payload?.email,
-  });
+  let user = await UserModel.findOne({ email: payload?.email });
 
-  // Check if a user exists with the provided email
-  if (!isUserExists) {
-    const result = await UserModel.create(payload);
-
-    const jwtPayload = {
-      email: result?.email,
-      role: result?.role,
-    };
-
-    //token
-    const token = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
-      expiresIn: "24h",
-    });
-
-    const userObject = {
-      user: result,
-      accessToken: token,
-    };
-
-    return userObject;
+  if (!user) {
+    user = await UserModel.create(payload);
+  } else {
+    user = await UserModel.findByIdAndUpdate(
+      user._id,
+      { status: "active" },
+      { new: true }
+    );
   }
 
-  const user = await UserModel.findByIdAndUpdate(
-    isUserExists?._id,
-    { status: "active" },
-    { new: true }
-  );
-
-  //generating token
   const jwtPayload = {
-    email: isUserExists?.email,
-    role: isUserExists?.role,
+    email: user?.email,
+    role: user?.role,
   };
 
-  //token
-  const token = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
-    expiresIn: "24h",
-  });
+  const { accessToken, refreshToken } = generateTokens(jwtPayload);
 
-  const userObject = {
-    user: user,
-    accessToken: token,
-  };
-
-  return userObject;
+  return { user, accessToken, refreshToken };
 };
 
-//logout current user and removing token from cookie
+// Refresh token
+const refreshAccessToken = async (refreshToken: string) => {
+  try {
+    const decoded = jwt.verify(
+      refreshToken,
+      config.jwt_refresh_secret as string
+    ) as jwt.JwtPayload;
+
+    const jwtPayload = {
+      email: decoded.email,
+      role: decoded.role,
+    };
+
+    const accessToken = jwt.sign(
+      jwtPayload,
+      config.jwt_access_secret as string,
+      { expiresIn: "15m" }
+    );
+
+    return { accessToken };
+  } catch (error) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "Invalid or expired refresh token"
+    );
+  }
+};
+
+// Logout
 const logoutUserFromDB = async (id: string) => {
   await UserModel.findByIdAndUpdate(id, { status: "inActive" }, { new: true });
   return {};
@@ -120,6 +120,7 @@ const logoutUserFromDB = async (id: string) => {
 export const AuthServices = {
   registerUserOnDB,
   loginUserFromDB,
-  logoutUserFromDB,
   loginUserUsingProviderFromDB,
+  refreshAccessToken,
+  logoutUserFromDB,
 };
