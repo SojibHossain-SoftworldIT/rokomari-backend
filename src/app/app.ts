@@ -18,6 +18,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:3000",
       "http://localhost:3001",
+      "https://www.bdmbazar.com"
     ],
     credentials: true,
   })
