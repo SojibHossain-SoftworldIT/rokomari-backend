@@ -1,127 +1,98 @@
 import { z } from "zod";
 
-// brandAndCategories validation
-const brandAndCategoryZodSchema = z.object({
-  brand: z.string({
-    error: () => "Brand ID is required!",
-  }),
-  categories: z
-    .array(z.string({ error: () => "Category ID must be a string!" }))
-    .min(1, { message: "At least one category is required!" }),
-  tags: z
-    .array(z.string({ error: () => "Tag ID must be a string!" }))
-    .min(1, { message: "At least one tag is required!" }),
+// categoryAndTags validation
+const categoryAndTagsZodSchema = z.object({
+  publisher: z.string({ error: "Publisher ID is required!" }),
+  categories: z.array(z.string()).min(1, "At least one category is required!"),
+  tags: z.array(z.string()).optional(),
 });
 
 // description validation
 const descriptionZodSchema = z.object({
-  name: z.string({
-    error: () => "Name is required!",
-  }),
+  name: z.string({ error: "Name is required!" }),
   slug: z.string().optional(),
-  unit: z.string({
-    error: () => "Unit is required!",
-  }),
-  description: z.string({
-    error: () => "A small description is required!",
-  }),
-  status: z.enum(["publish", "draft"], { message: "Custom error message" }),
+  description: z.string({ error: "Description is required!" }),
+  status: z.enum(["publish", "draft"]),
+  name_bn: z.string().optional(),
+  description_bn: z.string().optional(),
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  keywords: z.array(z.string()).optional(),
 });
 
 // external product validation
 const externalZodSchema = z.object({
-  productUrl: z.string().optional(),
+  productUrl: z.string().url().optional(),
   buttonLabel: z.string().optional(),
 });
 
 // productInfo validation
 const productInfoZodSchema = z.object({
-  price: z.number({
-    error: () => "Price is required!",
-  }),
-  salePrice: z.number({
-    error: () => "Sale price is required!",
-  }),
-  quantity: z.number({
-    error: () => "Quantity is required!",
-  }),
-  sku: z.string({
-    error: () => "SKU is required!",
-  }),
-  width: z.string({
-    error: () => "Width is required!",
-  }),
-  height: z.string({
-    error: () => "Height is required!",
-  }),
-  length: z.string({
-    error: () => "Length is required!",
-  }),
+  price: z.number({ error: "Price is required!" }),
+  salePrice: z.number().optional(),
+  quantity: z.number({ error: "Quantity is required!" }),
+  sku: z.string({ error: "SKU is required!" }),
+  weight: z.string().optional(),
+  dimensions: z
+    .object({
+      width: z.string().optional(),
+      height: z.string().optional(),
+      length: z.string().optional(),
+    })
+    .optional(),
   isDigital: z.boolean().optional(),
   digital: z.string().optional(),
   isExternal: z.boolean().optional(),
   external: externalZodSchema.optional(),
-  status: z.enum(["draft", "publish", "low-quantity"], {
-    message: "Status must be 'draft', 'publish', or 'low-quantity'",
-  }),
+  discount: z.number().optional(),
+  status: z.enum(["draft", "publish", "low-quantity", "out-of-stock"]),
+  publicationDate: z.string().optional(),
+  isOnSale: z.boolean().optional(),
+  campaign: z.string().optional(),
 });
 
-// Main Product Validation
-export const createProductZodSchema = z.object({
-  shopId: z.string({
-    error: () => "Shop ID is required!",
-  }),
-  video: z.string().optional(),
-  brandAndCategories: brandAndCategoryZodSchema,
-  description: descriptionZodSchema,
-  productType: z.enum(["simple", "variable"], {
-    message: "Product type must be 'simple' or 'variable'",
-  }),
-  productInfo: productInfoZodSchema,
-});
-
-
-
+// author validation
 const authorZodSchema = z.object({
-  name: z.string(),
-  image: z.string().url('Invalid author image URL!').optional(),
+  name: z.string({ error: "Author name is required!" }),
+  image: z.string().url().optional(),
   description: z.string().optional(),
 });
 
+// specification validation
 const specificationZodSchema = z.object({
-  title: z.string(),
-  author: authorZodSchema,
-  publisher: z.string(),
+  authors: z.array(authorZodSchema).min(1, "At least one author is required!"),
+  publisher: z.string({ error: "Publisher is required!" }),
   edition: z.string().optional(),
-  numberOfPages: z.number().optional(),
-  country: z.string().optional(),
-  language: z.string().optional(),
+  editionYear: z.number().optional(),
+  numberOfPages: z.number({ error: "Number of pages is required!" }),
+  country: z.string({ error: "Country is required!" }),
+  language: z.string({ error: "Language is required!" }),
+  isbn: z.string().optional(),
+  binding: z.enum(["hardcover", "paperback"]).optional(),
 });
 
+// bookInfo validation
 export const bookInfoZodSchema = z.object({
   specification: specificationZodSchema,
-  format: z.enum(['hardcover', 'paperback', 'ebook', 'audiobook']).optional(),
+  format: z.enum(["hardcover", "paperback", "ebook", "audiobook"]).optional(),
   genre: z.array(z.string()).optional(),
-  pages: z.number().optional(),
-  isbn: z.string().optional(),
+  series: z.string().optional(),
+  translator: z.string().optional(),
 });
 
-export const updateProductZodSchema = z.object({
-  shopId: z.string().optional(),
-  featuredImg: z.string().url('Invalid feature image URL!').optional(),
-  gallery: z
-    .array(z.string().url('Invalid gallery image URL!'))
-    .min(1, { message: 'At least one gallery image is required!' })
-    .optional(),
+// Create product
+export const createProductZodSchema = z.object({
+  featuredImg: z.string().optional(),
+  gallery: z.array(z.string()).optional(),
   video: z.string().optional(),
-  brandAndCategories: brandAndCategoryZodSchema.optional(),
-  description: descriptionZodSchema.optional(),
-  productType: z
-    .enum(['simple', 'variable'], {
-      message: "Product type must be 'simple' or 'variable'",
-    })
-    .optional(),
-  productInfo: productInfoZodSchema.optional(),
+  categoryAndTags: categoryAndTagsZodSchema,
+  description: descriptionZodSchema,
+  productType: z.enum(["simple", "variable"]),
+  productInfo: productInfoZodSchema,
+  bookInfo: bookInfoZodSchema,
+});
+
+// Update product
+export const updateProductZodSchema = createProductZodSchema.partial().extend({
   deletedImages: z.array(z.string()).optional(),
-  bookInfo: bookInfoZodSchema.optional(),
 });

@@ -1,17 +1,19 @@
-import { Types } from "mongoose";
-
-export type TBrandAndCategories = {
-  brand: Types.ObjectId;
-  categories: Types.ObjectId[];
-  tags: Types.ObjectId[];
+export type TCategoryAndTags = {
+  publisher: string; // Publisher name
+  categories: string[]; // e.g., Fiction, History
+  tags?: string[]; // keywords
 };
 
 export type TDescription = {
-  name: string;
-  slug?: string;
-  unit: string;
-  description: string;
+  name: string; // Book title
+  slug: string; // SEO-friendly URL slug
+  description: string; // Book summary
   status: "publish" | "draft";
+  name_bn?: string; // Bengali title
+  description_bn?: string; // Bengali summary
+  metaTitle?: string;
+  metaDescription?: string;
+  keywords?: string[];
 };
 
 export type TExternal = {
@@ -21,56 +23,65 @@ export type TExternal = {
 
 export type TProductInfo = {
   price: number;
-  salePrice: number;
+  salePrice?: number;
   quantity: number;
-  size: string;
   sku: string;
-  width: string;
-  height: string;
-  length: string;
+  weight?: string;
+  dimensions?: {
+    width?: string;
+    height?: string;
+    length?: string;
+  };
   isDigital?: boolean;
   digital?: string;
   isExternal?: boolean;
   external?: TExternal;
   discount?: number;
-  status: 'draft' | 'publish' | 'low-quantity';
+  status: "draft" | "publish" | "low-quantity" | "out-of-stock";
+  publicationDate?: Date;
+  isOnSale?: boolean;
+  campaign?: string;
+  inStock?: boolean; // derived field
 };
 
 export type TAuthor = {
   name: string;
-  image: string;
-  description: string;
-}
-
+  image?: string;
+  description?: string;
+};
 
 export type TSpecification = {
-  title: string;
-  Author: TAuthor;
-  Publisher: string;
-  edition: string;
+  authors: TAuthor[];
+  publisher: string; // Publisher name
+  edition?: string;
+  editionYear?: number;
   numberOfPages: number;
   country: string;
   language: string;
+  isbn?: string;
+  binding?: "hardcover" | "paperback";
 };
-
 
 export type TBookInfo = {
   specification: TSpecification;
-  format?: 'hardcover' | 'paperback' | 'ebook' | 'audiobook';
+  format?: "hardcover" | "paperback" | "ebook" | "audiobook";
   genre?: string[];
-  pages?: number;
-  isbn?: string;
+  series?: string;
+  translator?: string;
 };
 
 export type TProduct = {
-  shopId: Types.ObjectId;
   featuredImg: string;
-  gallery: string[];
+  gallery?: string[];
   video?: string;
-  brandAndCategories: TBrandAndCategories;
+  categoryAndTags: TCategoryAndTags;
   description: TDescription;
-  productType: 'simple' | 'variable';
+  productType: "simple" | "variable";
   productInfo: TProductInfo;
-  deletedImages?: string[];
-  bookInfo?: TBookInfo;
+  bookInfo: TBookInfo;
+  averageRating?: number;
+  ratingCount?: number;
+  reviewCount?: number;
+  wishlistCount?: number;
+  soldCount?: number;
 };

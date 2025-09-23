@@ -13,9 +13,9 @@ const createProductOnDB = async (payload: TProduct) => {
 const getAllProductFromDB = async (query: Record<string, unknown>) => {
   const productQuery = new QueryBuilder(
     ProductModel.find()
-      .populate("brandAndCategories.brand")
-      .populate("brandAndCategories.categories")
-      .populate("brandAndCategories.tags"),
+      .populate("categoryAndTags.publisher")
+      .populate("categoryAndTags.categories")
+      .populate("categoryAndTags.tags"),
     query
   )
     .search(ProductSearchableFields)
@@ -24,20 +24,18 @@ const getAllProductFromDB = async (query: Record<string, unknown>) => {
     .paginate()
     .fields();
 
-  const result = await productQuery.modelQuery;
-  return result;
+  return await productQuery.modelQuery;
 };
 
 const getProductsByCategoryandTag = async (category: string, tag: string) => {
-  const categories = category ? (category as string).split(",") : [];
+  const categories = category ? category.split(",") : [];
+  const tags = tag ? tag.split(",") : [];
 
-  const tags = tag ? (tag as string).split(",") : [];
-
-  const products = await ProductModel.aggregate([
+  return ProductModel.aggregate([
     {
       $lookup: {
         from: "categories",
-        localField: "brandAndCategories.categories",
+        localField: "categoryAndTags.categories",
         foreignField: "_id",
         as: "categoryDetails",
       },
@@ -45,23 +43,23 @@ const getProductsByCategoryandTag = async (category: string, tag: string) => {
     {
       $lookup: {
         from: "tags",
-        localField: "brandAndCategories.tags",
+        localField: "categoryAndTags.tags",
         foreignField: "_id",
         as: "tagDetails",
       },
     },
     {
       $lookup: {
-        from: "brands",
-        localField: "brandAndCategories.brand",
+        from: "publishers",
+        localField: "categoryAndTags.publisher",
         foreignField: "_id",
-        as: "brandDetails",
+        as: "publisherDetails",
       },
     },
     {
       $addFields: {
-        brandAndCategories: {
-          brand: { $arrayElemAt: ["$brandDetails", 0] },
+        categoryAndTags: {
+          publisher: { $arrayElemAt: ["$publisherDetails", 0] },
           categories: "$categoryDetails",
           tags: "$tagDetails",
         },
@@ -71,31 +69,26 @@ const getProductsByCategoryandTag = async (category: string, tag: string) => {
       $match: {
         "description.status": "publish",
         ...(categories.length
-          ? { "brandAndCategories.categories.name": { $in: categories } }
+          ? { "categoryAndTags.categories.name": { $in: categories } }
           : {}),
-        ...(tags.length
-          ? { "brandAndCategories.tags.name": { $in: tags } }
-          : {}),
+        ...(tags.length ? { "categoryAndTags.tags.name": { $in: tags } } : {}),
       },
     },
     {
       $project: {
         categoryDetails: 0,
         tagDetails: 0,
-        brandDetails: 0,
+        publisherDetails: 0,
       },
     },
   ]);
-
-  return products;
 };
 
 const getSingleProductFromDB = async (id: string) => {
-  const result = await ProductModel.findById(id)
-    .populate("brandAndCategories.brand")
-    .populate("brandAndCategories.categories")
-    .populate("brandAndCategories.tags");
-  return result;
+  return ProductModel.findById(id)
+    .populate("categoryAndTags.publisher")
+    .populate("categoryAndTags.categories")
+    .populate("categoryAndTags.tags");
 };
 
 const updateProductOnDB = async (
@@ -107,19 +100,19 @@ const updateProductOnDB = async (
     throw new AppError(404, "Product not found!");
   }
 
+  // handle gallery update with deletedImages
   if (
-    updatedData.deletedImages &&
-    updatedData.deletedImages.length > 0 &&
-    isProductExist.gallery &&
-    isProductExist.gallery.length > 0
+    (updatedData as any).deletedImages &&
+    (updatedData as any).deletedImages.length > 0 &&
+    isProductExist.gallery?.length
   ) {
     const restDBImages = isProductExist.gallery.filter(
-      (imageurl) => !updatedData.deletedImages?.includes(imageurl)
+      (img) => !(updatedData as any).deletedImages?.includes(img)
     );
 
     const updatedGalleryImages = (updatedData.gallery || [])
-      .filter((imageurl) => !updatedData.deletedImages?.includes(imageurl))
-      .filter((imageurl) => !restDBImages.includes(imageurl));
+      .filter((img) => !(updatedData as any).deletedImages?.includes(img))
+      .filter((img) => !restDBImages.includes(img));
 
     updatedData.gallery = [...restDBImages, ...updatedGalleryImages];
   }
@@ -130,11 +123,11 @@ const updateProductOnDB = async (
     { new: true, runValidators: true }
   );
 
-  // delete images from cloudinary if they are deleted
-  if (updatedData.deletedImages && updatedData.deletedImages.length > 0) {
+  // delete images from cloudinary
+  if ((updatedData as any).deletedImages?.length > 0) {
     await Promise.all(
-      updatedData.deletedImages.map((imageurl) =>
-        deleteImageFromCLoudinary(imageurl)
+      (updatedData as any).deletedImages.map((img: string) =>
+        deleteImageFromCLoudinary(img)
       )
     );
   }
@@ -146,31 +139,10 @@ const updateProductOnDB = async (
   return updatedProduct;
 };
 
-// const getProductOfSpecificShop = async (
-//   id: string,
-//   query: Record<string, unknown>
-// ) => {
-//   const productQuery = new QueryBuilder(
-//     ProductModel.find({ shopId: id })
-//       .populate("brandAndCategories.brand")
-//       .populate("brandAndCategories.categories")
-//       .populate("brandAndCategories.tags"),
-//     query
-//   )
-//     .search(ProductSearchableFields)
-//     .filter()
-//     .sort()
-//     .paginate()
-//     .fields();
-
-//   const result = await productQuery.modelQuery;
-//   return result;
-// };
-
 export const productServices = {
   createProductOnDB,
-  getSingleProductFromDB,
   getAllProductFromDB,
-  updateProductOnDB,
   getProductsByCategoryandTag,
+  getSingleProductFromDB,
+  updateProductOnDB,
 };
