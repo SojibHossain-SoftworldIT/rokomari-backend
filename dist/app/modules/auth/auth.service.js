@@ -13,86 +13,78 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthServices = void 0;
-const config_1 = __importDefault(require("../../config"));
-const user_model_1 = require("../user/user.model");
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const handleAppError_1 = __importDefault(require("../../errors/handleAppError"));
 const http_status_1 = __importDefault(require("http-status"));
-//register a user in database
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_1 = __importDefault(require("../../config"));
+const handleAppError_1 = __importDefault(require("../../errors/handleAppError"));
+const user_model_1 = require("../user/user.model");
+// Helper to generate tokens
+const generateTokens = (payload) => {
+    const accessToken = jsonwebtoken_1.default.sign(payload, config_1.default.jwt_access_secret, {
+        expiresIn: "15m", // shorter-lived
+    });
+    const refreshToken = jsonwebtoken_1.default.sign(payload, config_1.default.jwt_refresh_secret, {
+        expiresIn: "7d", // longer-lived
+    });
+    return { accessToken, refreshToken };
+};
+// Register a user in database
 const registerUserOnDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield user_model_1.UserModel.create(payload);
     return result;
 });
-//login an user with credentials
+// Login with credentials
 const loginUserFromDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const isUserExists = yield user_model_1.UserModel.findOne({
-        email: payload === null || payload === void 0 ? void 0 : payload.email,
-    });
-    // Check if a user exists with the provided email
+    const isUserExists = yield user_model_1.UserModel.findOne({ email: payload === null || payload === void 0 ? void 0 : payload.email });
     if (!isUserExists) {
         throw Error("User does not exists!");
     }
-    //check password
+    // check password
     const isPasswordMatched = yield bcrypt_1.default.compare(payload === null || payload === void 0 ? void 0 : payload.password, isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.password);
     if (!isPasswordMatched) {
         throw new handleAppError_1.default(http_status_1.default.UNAUTHORIZED, "Wrong Credentials!");
     }
     const user = yield user_model_1.UserModel.findByIdAndUpdate(isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists._id, { status: "active" }, { new: true });
-    //generating token
     const jwtPayload = {
         email: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.email,
         role: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.role,
     };
-    //token
-    const token = jsonwebtoken_1.default.sign(jwtPayload, config_1.default.jwt_access_secret, {
-        expiresIn: "24h",
-    });
-    const userObject = {
-        user: user,
-        accessToken: token,
-    };
-    return userObject;
+    const { accessToken, refreshToken } = generateTokens(jwtPayload);
+    return { user, accessToken, refreshToken };
 });
-//login an user with credentials
+// Login with provider
 const loginUserUsingProviderFromDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const isUserExists = yield user_model_1.UserModel.findOne({
-        email: payload === null || payload === void 0 ? void 0 : payload.email,
-    });
-    // Check if a user exists with the provided email
-    if (!isUserExists) {
-        const result = yield user_model_1.UserModel.create(payload);
-        const jwtPayload = {
-            email: result === null || result === void 0 ? void 0 : result.email,
-            role: result === null || result === void 0 ? void 0 : result.role,
-        };
-        //token
-        const token = jsonwebtoken_1.default.sign(jwtPayload, config_1.default.jwt_access_secret, {
-            expiresIn: "24h",
-        });
-        const userObject = {
-            user: result,
-            accessToken: token,
-        };
-        return userObject;
+    let user = yield user_model_1.UserModel.findOne({ email: payload === null || payload === void 0 ? void 0 : payload.email });
+    if (!user) {
+        user = yield user_model_1.UserModel.create(payload);
     }
-    const user = yield user_model_1.UserModel.findByIdAndUpdate(isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists._id, { status: "active" }, { new: true });
-    //generating token
+    else {
+        user = yield user_model_1.UserModel.findByIdAndUpdate(user._id, { status: "active" }, { new: true });
+    }
     const jwtPayload = {
-        email: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.email,
-        role: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.role,
+        email: user === null || user === void 0 ? void 0 : user.email,
+        role: user === null || user === void 0 ? void 0 : user.role,
     };
-    //token
-    const token = jsonwebtoken_1.default.sign(jwtPayload, config_1.default.jwt_access_secret, {
-        expiresIn: "24h",
-    });
-    const userObject = {
-        user: user,
-        accessToken: token,
-    };
-    return userObject;
+    const { accessToken, refreshToken } = generateTokens(jwtPayload);
+    return { user, accessToken, refreshToken };
 });
-//logout current user and removing token from cookie
+// Refresh token
+const refreshAccessToken = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const decoded = jsonwebtoken_1.default.verify(refreshToken, config_1.default.jwt_refresh_secret);
+        const jwtPayload = {
+            email: decoded.email,
+            role: decoded.role,
+        };
+        const accessToken = jsonwebtoken_1.default.sign(jwtPayload, config_1.default.jwt_access_secret, { expiresIn: "15m" });
+        return { accessToken };
+    }
+    catch (error) {
+        throw new handleAppError_1.default(http_status_1.default.UNAUTHORIZED, "Invalid or expired refresh token");
+    }
+});
+// Logout
 const logoutUserFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield user_model_1.UserModel.findByIdAndUpdate(id, { status: "inActive" }, { new: true });
     return {};
@@ -100,6 +92,7 @@ const logoutUserFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () 
 exports.AuthServices = {
     registerUserOnDB,
     loginUserFromDB,
-    logoutUserFromDB,
     loginUserUsingProviderFromDB,
+    refreshAccessToken,
+    logoutUserFromDB,
 };
