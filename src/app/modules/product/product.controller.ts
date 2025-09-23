@@ -1,6 +1,6 @@
+import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import httpStatus from "http-status";
 import { productServices } from "./product.service";
 
 const getAllProduct = catchAsync(async (req, res) => {
@@ -16,16 +16,19 @@ const getAllProduct = catchAsync(async (req, res) => {
 
 const getProductsByCategoryandTag = catchAsync(async (req, res) => {
   const { category, tag } = req.query;
-  
-  const result = await productServices.getProductsByCategoryandTag(category as string, tag as string)
+
+  const result = await productServices.getProductsByCategoryandTag(
+    category as string,
+    tag as string
+  );
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Products retrieve successfully!',
+    message: "Products retrieve successfully!",
     data: result,
   });
- })
+});
 
 const getSingleProduct = catchAsync(async (req, res) => {
   const id = req.params.id;
@@ -39,17 +42,40 @@ const getSingleProduct = catchAsync(async (req, res) => {
   });
 });
 
+// const createProduct = catchAsync(async (req, res) => {
+//   const files = req.files as {
+//     [fieldname: string]: Express.Multer.File[];
+//   };
+
+//   const productData = {
+//     ...req.body,
+//     featuredImg: files["featuredImgFile"]?.[0]?.path || "",
+//     gallery: files["galleryImagesFiles"]
+//       ? files["galleryImagesFiles"].map((f) => f.path)
+//       : [],
+//   };
+
+//   const result = await productServices.createProductOnDB(productData);
+
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.CREATED,
+//     message: "Product created successfully!",
+//     data: result,
+//   });
+// });
+
 const createProduct = catchAsync(async (req, res) => {
-  const files = req.files as {
-    [fieldname: string]: Express.Multer.File[];
-  };
+  const files =
+    (req.files as { [fieldname: string]: Express.Multer.File[] }) || {};
 
   const productData = {
     ...req.body,
-    featuredImg: files["featuredImgFile"]?.[0]?.path || "",
+    featuredImg:
+      files["featuredImgFile"]?.[0]?.path || req.body.featuredImg || "",
     gallery: files["galleryImagesFiles"]
       ? files["galleryImagesFiles"].map((f) => f.path)
-      : [],
+      : req.body.gallery || [],
   };
 
   const result = await productServices.createProductOnDB(productData);
