@@ -24,8 +24,7 @@ import {
 const categoryAndTagsSchema = new Schema<TCategoriesAndTags>(
   {
     publisher: {
-      type: Schema.Types.ObjectId,
-      ref: "publisher",
+      type: String,
       required: true,
     },
     categories: [
