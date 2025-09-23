@@ -2,7 +2,7 @@ import { model, Schema } from "mongoose";
 import {
   TAuthor,
   TBookInfo,
-  TCategoryAndTags,
+  TCategoriesAndTags,
   TDescription,
   TExternal,
   TProduct,
@@ -11,15 +11,30 @@ import {
 } from "./product.interface";
 
 // Category & Tags Schema
-const categoryAndTagsSchema = new Schema<TCategoryAndTags>(
+// const categoryAndTagsSchema = new Schema<TCategoryAndTags>(
+//   {
+//     publisher: { type: String, required: true },
+//     categories: [{ type: String, required: true }],
+//     tags: [{ type: String }],
+//   },
+//   { _id: false }
+// );
+
+// Category & Tags Schema
+const categoryAndTagsSchema = new Schema<TCategoriesAndTags>(
   {
-    publisher: { type: String, required: true },
-    categories: [{ type: String, required: true }],
-    tags: [{ type: String }],
+    publisher: {
+      type: Schema.Types.ObjectId,
+      ref: "publisher",
+      required: true,
+    },
+    categories: [
+      { type: Schema.Types.ObjectId, ref: "category", required: true },
+    ],
+    tags: [{ type: Schema.Types.ObjectId, ref: "tag", required: true }],
   },
   { _id: false }
 );
-
 // Description Schema
 const descriptionSchema = new Schema<TDescription>(
   {

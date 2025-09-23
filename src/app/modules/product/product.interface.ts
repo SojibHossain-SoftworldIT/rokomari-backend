@@ -1,8 +1,16 @@
-export type TCategoryAndTags = {
-  publisher: string; // Publisher name
-  categories: string[]; // e.g., Fiction, History
-  tags?: string[]; // keywords
+import { Types } from "mongoose";
+
+export type TCategoriesAndTags = {
+  publisher: Types.ObjectId; // Publisher ID
+  categories: Types.ObjectId[];
+  tags: Types.ObjectId[];
 };
+
+// export type TCategoryAndTags = {
+//   publisher: string; // Publisher name
+//   categories: string[]; // e.g., Fiction, History
+//   tags?: string[]; // keywords
+// };
 
 export type TDescription = {
   name: string; // Book title
@@ -74,7 +82,7 @@ export type TProduct = {
   featuredImg: string;
   gallery?: string[];
   video?: string;
-  categoryAndTags: TCategoryAndTags;
+  categoryAndTags: TCategoriesAndTags;
   description: TDescription;
   productType: "simple" | "variable";
   productInfo: TProductInfo;

@@ -4,7 +4,7 @@ import { z } from "zod";
 const categoryAndTagsZodSchema = z.object({
   publisher: z.string({ error: "Publisher ID is required!" }),
   categories: z.array(z.string()).min(1, "At least one category is required!"),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string()).min(1, "At least one tag is required!"),
 });
 
 // description validation
