@@ -119,14 +119,6 @@ const orderInfoZodSchema = z.object({
           : "Must be a valid ObjectId string!",
     })
   ),
-  shopInfo: objectIdSchema.or(
-    z.string({
-      error: (issue) =>
-        issue.input === undefined
-          ? "Shop info is required!"
-          : "Must be a valid ObjectId string!",
-    })
-  ),
   productInfo: objectIdSchema.or(
     z.string({
       error: (issue) =>

@@ -85,11 +85,6 @@ const orderInfoSchema = new Schema<TOrderInfo>(
       ref: "customer",
       required: true,
     },
-    shopInfo: {
-      type: Schema.Types.ObjectId,
-      ref: "shop",
-      required: true,
-    },
     productInfo: {
       type: Schema.Types.ObjectId,
       ref: "product",
