@@ -1,157 +1,103 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProductModel = exports.BookInfoSchema = void 0;
+exports.ProductModel = void 0;
 const mongoose_1 = require("mongoose");
-const brandAndCategorySchema = new mongoose_1.Schema({
-    brand: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        required: [true, "Brand is Required!"],
-        ref: "brand",
-    },
-    categories: {
-        type: [mongoose_1.Schema.Types.ObjectId],
-        required: [true, "Category is Required!"],
-        ref: "category",
-    },
-    tags: {
-        type: [mongoose_1.Schema.Types.ObjectId],
-        required: [true, "Tag is Required!"],
-        ref: "tag",
-    },
-}, { _id: false } // Prevents creating a separate _id for icon
-);
+// Category & Tags Schema
+const categoryAndTagsSchema = new mongoose_1.Schema({
+    publisher: { type: String, required: true },
+    categories: [{ type: String, required: true }],
+    tags: [{ type: String }],
+}, { _id: false });
+// Description Schema
 const descriptionSchema = new mongoose_1.Schema({
-    name: {
-        type: String,
-        required: [true, "Name is Required!"],
-    },
-    slug: { type: String },
-    unit: {
-        type: String,
-        required: [true, "Unit is Required!"],
-    },
-    description: {
-        type: String,
-        required: [true, "A small description is required!"],
-    },
-    status: {
-        type: String,
-        enum: ["publish", "draft"],
-        required: [true, "Status is required!"],
-        default: "draft",
-    },
-}, { _id: false } // Prevents creating a separate _id for icon
-);
+    name: { type: String, required: true },
+    slug: { type: String, required: true, unique: true },
+    description: { type: String, required: true },
+    status: { type: String, enum: ["publish", "draft"], default: "draft" },
+    name_bn: String,
+    description_bn: String,
+    metaTitle: String,
+    metaDescription: String,
+    keywords: [String],
+}, { _id: false });
+// External Schema
 const externalSchema = new mongoose_1.Schema({
-    productUrl: {
-        type: String,
-    },
-    buttonLabel: {
-        type: String,
-    },
-}, { _id: false } // Prevents creating a separate _id for icon
-);
+    productUrl: String,
+    buttonLabel: String,
+}, { _id: false });
+// Product Info Schema
 const productInfoSchema = new mongoose_1.Schema({
-    price: {
-        type: Number,
-        required: [true, "Price is Required!"],
+    price: { type: Number, required: true },
+    salePrice: Number,
+    quantity: { type: Number, required: true },
+    sku: { type: String, required: true, unique: true },
+    weight: String,
+    dimensions: {
+        width: String,
+        height: String,
+        length: String,
     },
-    salePrice: {
-        type: Number,
-        required: [true, "Sale price is Required!"],
-    },
-    quantity: {
-        type: Number,
-        required: [true, "Quantity is Required!"],
-    },
-    size: { type: String },
-    sku: {
-        type: String,
-        required: [true, "sku is Required!"],
-    },
-    width: {
-        type: String,
-        required: [true, "Width is Required!"],
-    },
-    height: {
-        type: String,
-        required: [true, "Height is Required!"],
-    },
-    length: {
-        type: String,
-        required: [true, "Length is Required!"],
-    },
-    isDigital: {
-        type: Boolean,
-    },
-    digital: {
-        type: String,
-    },
-    isExternal: {
-        type: Boolean,
-    },
+    isDigital: Boolean,
+    digital: String,
+    isExternal: Boolean,
     external: externalSchema,
     discount: { type: Number, default: 0 },
     status: {
         type: String,
-        enum: ["draft", "publish", "low-quantity"],
-        required: [true, "Status is Required!"],
+        enum: ["draft", "publish", "low-quantity", "out-of-stock"],
+        default: "publish",
     },
-}, {
-    timestamps: true,
-});
-const AuthorSchema = new mongoose_1.Schema({
-    name: { type: String },
-    image: { type: String },
-    description: { type: String }
+    publicationDate: Date,
+    isOnSale: { type: Boolean, default: false },
+    campaign: String,
+    inStock: { type: Boolean, default: true },
 }, { _id: false });
-const SpecificationSchema = new mongoose_1.Schema({
-    title: { type: String },
-    Author: { type: AuthorSchema },
-    Publisher: { type: String },
-    edition: { type: String },
-    numberOfPages: { type: Number },
-    country: { type: String },
-    language: { type: String },
+// Author Schema
+const authorSchema = new mongoose_1.Schema({
+    name: { type: String, required: true },
+    image: String,
+    description: String,
 }, { _id: false });
-// BookInfo SubSchema
-exports.BookInfoSchema = new mongoose_1.Schema({
-    specification: { type: SpecificationSchema },
+// Specification Schema
+const specificationSchema = new mongoose_1.Schema({
+    authors: { type: [authorSchema], required: true },
+    publisher: {
+        type: String,
+        required: true,
+    },
+    edition: String,
+    editionYear: Number,
+    numberOfPages: { type: Number, required: true },
+    country: { type: String, required: true },
+    language: { type: String, required: true },
+    isbn: String,
+    binding: { type: String, enum: ["hardcover", "paperback"] },
+}, { _id: false });
+// BookInfo Schema
+const bookInfoSchema = new mongoose_1.Schema({
+    specification: { type: specificationSchema, required: true },
     format: {
         type: String,
         enum: ["hardcover", "paperback", "ebook", "audiobook"],
     },
-    genre: [{ type: String }],
-    pages: { type: Number },
-    isbn: { type: String },
+    genre: [String],
+    series: String,
+    translator: String,
 }, { _id: false });
+// Product Schema
 const productSchema = new mongoose_1.Schema({
-    shopId: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        required: [true, "ShopId is Required!"],
-    },
-    featuredImg: {
-        type: String,
-        required: [true, "Feature image is Required!"],
-    },
-    gallery: {
-        type: [String],
-        required: [true, "Gallery is Required!"],
-        default: [],
-    },
-    video: {
-        type: String,
-    },
-    brandAndCategories: brandAndCategorySchema,
-    description: descriptionSchema,
-    productType: {
-        type: String,
-        enum: ["simple", "variable"],
-        required: [true, "Product type is Required!"],
-    },
-    productInfo: productInfoSchema,
-    bookInfo: { type: exports.BookInfoSchema },
-}, {
-    timestamps: true,
-});
-exports.ProductModel = (0, mongoose_1.model)("product", productSchema);
+    featuredImg: { type: String, required: true },
+    gallery: [String],
+    video: String,
+    categoryAndTags: { type: categoryAndTagsSchema, required: true },
+    description: { type: descriptionSchema, required: true },
+    productType: { type: String, enum: ["simple", "variable"], required: true },
+    productInfo: { type: productInfoSchema, required: true },
+    bookInfo: { type: bookInfoSchema, required: true },
+    averageRating: { type: Number, default: 0 },
+    ratingCount: { type: Number, default: 0 },
+    reviewCount: { type: Number, default: 0 },
+    wishlistCount: { type: Number, default: 0 },
+    soldCount: { type: Number, default: 0 },
+}, { timestamps: true });
+exports.ProductModel = (0, mongoose_1.model)("Product", productSchema);

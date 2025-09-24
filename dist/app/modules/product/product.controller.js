@@ -13,9 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.productControllers = void 0;
+const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
-const http_status_1 = __importDefault(require("http-status"));
 const product_service_1 = require("./product.service");
 const getAllProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield product_service_1.productServices.getAllProductFromDB(req.query);
@@ -32,7 +32,7 @@ const getProductsByCategoryandTag = (0, catchAsync_1.default)((req, res) => __aw
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
-        message: 'Products retrieve successfully!',
+        message: "Products retrieve successfully!",
         data: result,
     });
 }));
@@ -46,12 +46,31 @@ const getSingleProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 
         data: result,
     });
 }));
+// const createProduct = catchAsync(async (req, res) => {
+//   const files = req.files as {
+//     [fieldname: string]: Express.Multer.File[];
+//   };
+//   const productData = {
+//     ...req.body,
+//     featuredImg: files["featuredImgFile"]?.[0]?.path || "",
+//     gallery: files["galleryImagesFiles"]
+//       ? files["galleryImagesFiles"].map((f) => f.path)
+//       : [],
+//   };
+//   const result = await productServices.createProductOnDB(productData);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.CREATED,
+//     message: "Product created successfully!",
+//     data: result,
+//   });
+// });
 const createProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
-    const files = req.files;
-    const productData = Object.assign(Object.assign({}, req.body), { featuredImg: ((_b = (_a = files["featuredImgFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) || "", gallery: files["galleryImagesFiles"]
+    const files = req.files || {};
+    const productData = Object.assign(Object.assign({}, req.body), { featuredImg: ((_b = (_a = files["featuredImgFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) || req.body.featuredImg || "", gallery: files["galleryImagesFiles"]
             ? files["galleryImagesFiles"].map((f) => f.path)
-            : [] });
+            : req.body.gallery || [] });
     const result = yield product_service_1.productServices.createProductOnDB(productData);
     (0, sendResponse_1.default)(res, {
         success: true,

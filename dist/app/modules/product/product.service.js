@@ -24,25 +24,24 @@ const createProductOnDB = (payload) => __awaiter(void 0, void 0, void 0, functio
 });
 const getAllProductFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
     const productQuery = new QueryBuilder_1.default(product_model_1.ProductModel.find()
-        .populate("brandAndCategories.brand")
-        .populate("brandAndCategories.categories")
-        .populate("brandAndCategories.tags"), query)
+        .populate("categoryAndTags.publisher")
+        .populate("categoryAndTags.categories")
+        .populate("categoryAndTags.tags"), query)
         .search(product_const_1.ProductSearchableFields)
         .filter()
         .sort()
         .paginate()
         .fields();
-    const result = yield productQuery.modelQuery;
-    return result;
+    return yield productQuery.modelQuery;
 });
 const getProductsByCategoryandTag = (category, tag) => __awaiter(void 0, void 0, void 0, function* () {
     const categories = category ? category.split(",") : [];
     const tags = tag ? tag.split(",") : [];
-    const products = yield product_model_1.ProductModel.aggregate([
+    return product_model_1.ProductModel.aggregate([
         {
             $lookup: {
                 from: "categories",
-                localField: "brandAndCategories.categories",
+                localField: "categoryAndTags.categories",
                 foreignField: "_id",
                 as: "categoryDetails",
             },
@@ -50,23 +49,23 @@ const getProductsByCategoryandTag = (category, tag) => __awaiter(void 0, void 0,
         {
             $lookup: {
                 from: "tags",
-                localField: "brandAndCategories.tags",
+                localField: "categoryAndTags.tags",
                 foreignField: "_id",
                 as: "tagDetails",
             },
         },
         {
             $lookup: {
-                from: "brands",
-                localField: "brandAndCategories.brand",
+                from: "publishers",
+                localField: "categoryAndTags.publisher",
                 foreignField: "_id",
-                as: "brandDetails",
+                as: "publisherDetails",
             },
         },
         {
             $addFields: {
-                brandAndCategories: {
-                    brand: { $arrayElemAt: ["$brandDetails", 0] },
+                categoryAndTags: {
+                    publisher: { $arrayElemAt: ["$publisherDetails", 0] },
                     categories: "$categoryDetails",
                     tags: "$tagDetails",
                 },
@@ -74,76 +73,54 @@ const getProductsByCategoryandTag = (category, tag) => __awaiter(void 0, void 0,
         },
         {
             $match: Object.assign(Object.assign({ "description.status": "publish" }, (categories.length
-                ? { "brandAndCategories.categories.name": { $in: categories } }
-                : {})), (tags.length
-                ? { "brandAndCategories.tags.name": { $in: tags } }
-                : {})),
+                ? { "categoryAndTags.categories.name": { $in: categories } }
+                : {})), (tags.length ? { "categoryAndTags.tags.name": { $in: tags } } : {})),
         },
         {
             $project: {
                 categoryDetails: 0,
                 tagDetails: 0,
-                brandDetails: 0,
+                publisherDetails: 0,
             },
         },
     ]);
-    return products;
 });
 const getSingleProductFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield product_model_1.ProductModel.findById(id)
-        .populate("brandAndCategories.brand")
-        .populate("brandAndCategories.categories")
-        .populate("brandAndCategories.tags");
-    return result;
+    return product_model_1.ProductModel.findById(id)
+        .populate("categoryAndTags.publisher")
+        .populate("categoryAndTags.categories")
+        .populate("categoryAndTags.tags");
 });
 const updateProductOnDB = (id, updatedData) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     const isProductExist = yield product_model_1.ProductModel.findById(id);
     if (!isProductExist) {
         throw new handleAppError_1.default(404, "Product not found!");
     }
+    // handle gallery update with deletedImages
     if (updatedData.deletedImages &&
         updatedData.deletedImages.length > 0 &&
-        isProductExist.gallery &&
-        isProductExist.gallery.length > 0) {
-        const restDBImages = isProductExist.gallery.filter((imageurl) => { var _a; return !((_a = updatedData.deletedImages) === null || _a === void 0 ? void 0 : _a.includes(imageurl)); });
+        ((_a = isProductExist.gallery) === null || _a === void 0 ? void 0 : _a.length)) {
+        const restDBImages = isProductExist.gallery.filter((img) => { var _a; return !((_a = updatedData.deletedImages) === null || _a === void 0 ? void 0 : _a.includes(img)); });
         const updatedGalleryImages = (updatedData.gallery || [])
-            .filter((imageurl) => { var _a; return !((_a = updatedData.deletedImages) === null || _a === void 0 ? void 0 : _a.includes(imageurl)); })
-            .filter((imageurl) => !restDBImages.includes(imageurl));
+            .filter((img) => { var _a; return !((_a = updatedData.deletedImages) === null || _a === void 0 ? void 0 : _a.includes(img)); })
+            .filter((img) => !restDBImages.includes(img));
         updatedData.gallery = [...restDBImages, ...updatedGalleryImages];
     }
     const updatedProduct = yield product_model_1.ProductModel.findByIdAndUpdate(id, { $set: updatedData }, { new: true, runValidators: true });
-    // delete images from cloudinary if they are deleted
-    if (updatedData.deletedImages && updatedData.deletedImages.length > 0) {
-        yield Promise.all(updatedData.deletedImages.map((imageurl) => (0, cloudinary_config_1.deleteImageFromCLoudinary)(imageurl)));
+    // delete images from cloudinary
+    if (((_b = updatedData.deletedImages) === null || _b === void 0 ? void 0 : _b.length) > 0) {
+        yield Promise.all(updatedData.deletedImages.map((img) => (0, cloudinary_config_1.deleteImageFromCLoudinary)(img)));
     }
     if (updatedData.featuredImg && isProductExist.featuredImg) {
         yield (0, cloudinary_config_1.deleteImageFromCLoudinary)(isProductExist.featuredImg);
     }
     return updatedProduct;
 });
-// const getProductOfSpecificShop = async (
-//   id: string,
-//   query: Record<string, unknown>
-// ) => {
-//   const productQuery = new QueryBuilder(
-//     ProductModel.find({ shopId: id })
-//       .populate("brandAndCategories.brand")
-//       .populate("brandAndCategories.categories")
-//       .populate("brandAndCategories.tags"),
-//     query
-//   )
-//     .search(ProductSearchableFields)
-//     .filter()
-//     .sort()
-//     .paginate()
-//     .fields();
-//   const result = await productQuery.modelQuery;
-//   return result;
-// };
 exports.productServices = {
     createProductOnDB,
-    getSingleProductFromDB,
     getAllProductFromDB,
-    updateProductOnDB,
     getProductsByCategoryandTag,
+    getSingleProductFromDB,
+    updateProductOnDB,
 };
