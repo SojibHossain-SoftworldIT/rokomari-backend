@@ -1,10 +1,10 @@
+import httpStatus from "http-status";
+import { nanoid } from "nanoid";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/handleAppError";
-import httpStatus from "http-status";
-import { OrderModel } from "./order.model";
 import { OrderSearchableFields } from "./order.consts";
 import { TOrder } from "./order.interface";
-import { nanoid } from "nanoid";
+import { OrderModel } from "./order.model";
 
 const getAllOrdersFromDB = async (query: Record<string, unknown>) => {
   const orderQuery = new QueryBuilder(OrderModel.find(), query)

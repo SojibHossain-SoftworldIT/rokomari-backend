@@ -1,12 +1,12 @@
 import { Schema, model } from "mongoose";
+import { TShipping } from "../transactions/transactions.interface";
 import {
+  TCustomerInfo,
   TOrder,
   TOrderInfo,
-  TTotalAmount,
-  TCustomerInfo,
   TPaymentInfo,
+  TTotalAmount,
 } from "./order.interface";
-import { TShipping } from "../transactions/transactions.interface";
 
 // Shipping Schema
 const shippingSchema = new Schema<TShipping>(
