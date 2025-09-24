@@ -33,7 +33,6 @@ export type TPaymentInfo = {
 
 export type TOrderInfo = {
   orderBy: Types.ObjectId;
-  shopInfo: Types.ObjectId;
   productInfo: Types.ObjectId;
   trackingNumber?: String;
   status:
