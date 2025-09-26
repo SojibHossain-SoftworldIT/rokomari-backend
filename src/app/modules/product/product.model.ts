@@ -25,7 +25,6 @@ const categoryAndTagsSchema = new Schema<TCategoriesAndTags>(
   {
     publisher: {
       type: String,
-      required: true,
     },
     categories: [
       { type: Schema.Types.ObjectId, ref: "category", required: true },

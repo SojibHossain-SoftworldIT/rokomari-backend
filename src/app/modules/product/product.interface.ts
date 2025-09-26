@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 
 export type TCategoriesAndTags = {
-  publisher: string; // Name of the publisher
+  publisher?: string; // Name of the publisher
   categories: Types.ObjectId[];
   tags: Types.ObjectId[];
 };
