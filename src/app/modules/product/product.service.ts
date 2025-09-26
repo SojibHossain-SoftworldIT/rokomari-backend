@@ -139,9 +139,19 @@ const updateProductOnDB = async (
   return updatedProduct;
 };
 
+// delete product from database
+
+const deleteSingleProductOnDB = async (id: string) => {
+  const product = await ProductModel.findByIdAndDelete(id);
+  if (!product) {
+    throw new AppError(404, "Product not found!");
+  }
+};
+
 export const productServices = {
   createProductOnDB,
   getAllProductFromDB,
+  deleteSingleProductOnDB,
   getProductsByCategoryandTag,
   getSingleProductFromDB,
   updateProductOnDB,
