@@ -6,7 +6,7 @@ import { dashboardService } from "./dashboard.service";
 
 // Create
 const createDashboard = catchAsync(async (req: Request, res: Response) => {
-  const result = await dashboardService.createDashboard(req.body);
+  const result = await dashboardService.createDashboard(req.body)
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
