@@ -4,7 +4,7 @@ import config from "../../config";
 import { possibleGenders, userRoles, userStatus } from "./user.const";
 import { TUser } from "./user.interface";
 
-//mongoose schema for user
+
 const userSchema = new Schema<TUser>(
   {
     name: {
