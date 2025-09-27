@@ -1,6 +1,6 @@
+import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import httpStatus from "http-status";
 import { UserServices } from "./user.service";
 
 const getAllUser = catchAsync(async (req, res) => {
@@ -75,6 +75,19 @@ const updateUser = catchAsync(async (req, res) => {
   });
 });
 
+const deleteSingleUser = catchAsync(async (req, res) => {
+  const id = req.params.id;
+
+  await UserServices.deletSingleUserFromDB(id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User deleted successfully!",
+    data: undefined,
+  });
+});
+
 export const UserControllers = {
   getSingleUser,
   getAllUser,
@@ -82,4 +95,5 @@ export const UserControllers = {
   getSuperAdmin,
   getAllVendorUser,
   updateUser,
+  deleteSingleUser,
 };

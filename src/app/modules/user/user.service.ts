@@ -1,11 +1,11 @@
+import bcrypt from "bcrypt";
+import httpStatus from "http-status";
+import QueryBuilder from "../../builder/QueryBuilder";
+import config from "../../config";
 import AppError from "../../errors/handleAppError";
+import { VendorSearchableFields } from "../vendor/vendor.consts";
 import { TUser } from "./user.interface";
 import { UserModel } from "./user.model";
-import httpStatus from "http-status";
-import bcrypt from "bcrypt";
-import config from "../../config";
-import QueryBuilder from "../../builder/QueryBuilder";
-import { VendorSearchableFields } from "../vendor/vendor.consts";
 
 const getAllUserFromDB = async () => {
   const result = await UserModel.find();
@@ -83,9 +83,20 @@ const updateUserOnDB = async (
   return result;
 };
 
+const deletSingleUserFromDB = async (id: string) => {
+  const isUserExists = await UserModel.findById(id);
+
+  if (!isUserExists) {
+    throw new AppError(httpStatus.NOT_FOUND, "User does not Exists!");
+  }
+
+  await UserModel.findByIdAndDelete(id);
+};
+
 export const UserServices = {
   getAllUserFromDB,
   getSingleUserFromDB,
+  deletSingleUserFromDB,
   getAllAdminFromDB,
   getAllVendorFromDB,
   getAdminProfileFromDB,

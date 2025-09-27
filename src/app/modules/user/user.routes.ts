@@ -40,4 +40,6 @@ router.get("/:id", UserControllers.getSingleUser);
 
 router.patch("/:id", UserControllers.updateUser);
 
+router.delete("/:id", UserControllers.deleteSingleUser);
+
 export const UserRoutes = router;

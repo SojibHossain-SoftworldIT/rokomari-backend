@@ -1,8 +1,8 @@
+import bcrypt from "bcrypt";
 import { Schema, model } from "mongoose";
+import config from "../../config";
 import { possibleGenders, userRoles, userStatus } from "./user.const";
 import { TUser } from "./user.interface";
-import config from "../../config";
-import bcrypt from "bcrypt";
 
 //mongoose schema for user
 const userSchema = new Schema<TUser>(
@@ -20,6 +20,7 @@ const userSchema = new Schema<TUser>(
     password: {
       type: String,
       minlength: [6, "Password must be at least 6 characters long!"],
+      required: [true, "Password is required to create a user!"],
     },
     role: {
       type: String,
@@ -79,13 +80,20 @@ userSchema.pre("save", async function (next) {
 });
 
 //removing password from document for security
-userSchema.post("save", function (doc, next) {
-  if (doc.password) {
-    doc.password = "";
-  }
+// userSchema.post("save", function (doc, next) {
+//   if (doc.password) {
+//     doc.password = "";
+//   }
 
-  next();
-});
+//   next();
+// });
+
+// Hide password in JSON output, but keep it in DB
+userSchema.methods.toJSON = function () {
+  const userObject = this.toObject();
+  delete userObject.password;
+  return userObject;
+};
 
 // Remove passwords from results
 userSchema.post("find", function (docs, next) {
