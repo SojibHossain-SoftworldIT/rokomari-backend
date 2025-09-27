@@ -18,7 +18,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:3000",
       "http://localhost:3001",
-      "https://www.bdmbazar.com"
+      "https://www.bdmbazar.com",
     ],
     credentials: true,
   })
@@ -29,7 +29,7 @@ app.use("/api/v1", router);
 
 //root route
 app.get("/", (req: Request, res: Response) => {
-  res.send("MegaMart server boosted on....🔥🔥🚀");
+  res.send("Rokomari server boosted on....🔥🔥🚀");
 });
 
 // //global error handler
