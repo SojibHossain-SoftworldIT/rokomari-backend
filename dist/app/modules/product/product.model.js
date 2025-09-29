@@ -3,10 +3,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductModel = void 0;
 const mongoose_1 = require("mongoose");
 // Category & Tags Schema
+// const categoryAndTagsSchema = new Schema<TCategoryAndTags>(
+//   {
+//     publisher: { type: String, required: true },
+//     categories: [{ type: String, required: true }],
+//     tags: [{ type: String }],
+//   },
+//   { _id: false }
+// );
+// Category & Tags Schema
 const categoryAndTagsSchema = new mongoose_1.Schema({
-    publisher: { type: String, required: true },
-    categories: [{ type: String, required: true }],
-    tags: [{ type: String }],
+    publisher: {
+        type: String,
+    },
+    categories: [
+        { type: mongoose_1.Schema.Types.ObjectId, ref: "category", required: true },
+    ],
+    tags: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "tag", required: true }],
 }, { _id: false });
 // Description Schema
 const descriptionSchema = new mongoose_1.Schema({

@@ -62,11 +62,6 @@ const orderInfoSchema = new mongoose_1.Schema({
         ref: "customer",
         required: true,
     },
-    shopInfo: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: "shop",
-        required: true,
-    },
     productInfo: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "product",

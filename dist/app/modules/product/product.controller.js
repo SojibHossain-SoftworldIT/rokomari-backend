@@ -98,9 +98,21 @@ const updateProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
         data: result,
     });
 }));
+// Product delete controller
+const deleteSingleProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield product_service_1.productServices.deleteSingleProductOnDB(id);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Product deleted successfully!",
+        data: result,
+    });
+}));
 exports.productControllers = {
     createProduct,
     getSingleProduct,
+    deleteSingleProduct,
     getAllProduct,
     updateProduct,
     getProductsByCategoryandTag,

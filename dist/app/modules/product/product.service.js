@@ -117,9 +117,17 @@ const updateProductOnDB = (id, updatedData) => __awaiter(void 0, void 0, void 0,
     }
     return updatedProduct;
 });
+// delete product from database
+const deleteSingleProductOnDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const product = yield product_model_1.ProductModel.findByIdAndDelete(id);
+    if (!product) {
+        throw new handleAppError_1.default(404, "Product not found!");
+    }
+});
 exports.productServices = {
     createProductOnDB,
     getAllProductFromDB,
+    deleteSingleProductOnDB,
     getProductsByCategoryandTag,
     getSingleProductFromDB,
     updateProductOnDB,

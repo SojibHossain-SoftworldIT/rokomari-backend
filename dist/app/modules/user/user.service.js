@@ -24,13 +24,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserServices = void 0;
-const handleAppError_1 = __importDefault(require("../../errors/handleAppError"));
-const user_model_1 = require("./user.model");
-const http_status_1 = __importDefault(require("http-status"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const config_1 = __importDefault(require("../../config"));
+const http_status_1 = __importDefault(require("http-status"));
 const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
+const config_1 = __importDefault(require("../../config"));
+const handleAppError_1 = __importDefault(require("../../errors/handleAppError"));
 const vendor_consts_1 = require("../vendor/vendor.consts");
+const user_model_1 = require("./user.model");
 const getAllUserFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield user_model_1.UserModel.find();
     return result;
@@ -84,9 +84,17 @@ const updateUserOnDB = (id, payload) => __awaiter(void 0, void 0, void 0, functi
     });
     return result;
 });
+const deletSingleUserFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const isUserExists = yield user_model_1.UserModel.findById(id);
+    if (!isUserExists) {
+        throw new handleAppError_1.default(http_status_1.default.NOT_FOUND, "User does not Exists!");
+    }
+    yield user_model_1.UserModel.findByIdAndDelete(id);
+});
 exports.UserServices = {
     getAllUserFromDB,
     getSingleUserFromDB,
+    deletSingleUserFromDB,
     getAllAdminFromDB,
     getAllVendorFromDB,
     getAdminProfileFromDB,

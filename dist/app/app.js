@@ -20,7 +20,9 @@ app.use((0, cors_1.default)({
         "http://localhost:5173",
         "http://localhost:3000",
         "http://localhost:3001",
-        "https://www.bdmbazar.com"
+        "https://www.bdmbazar.com",
+        "https://rokomari-admin-panel.vercel.app",
+        "https://www.bdmbazar.com",
     ],
     credentials: true,
 }));
@@ -28,7 +30,7 @@ app.use((0, cors_1.default)({
 app.use("/api/v1", routes_1.default);
 //root route
 app.get("/", (req, res) => {
-    res.send("MegaMart server boosted on....🔥🔥🚀");
+    res.send("Rokomari server boosted on....🔥🔥🚀");
 });
 // //global error handler
 app.use(globalErrorHandler_1.default);

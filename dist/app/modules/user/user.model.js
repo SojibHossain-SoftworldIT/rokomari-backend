@@ -13,11 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserModel = void 0;
-const mongoose_1 = require("mongoose");
-const user_const_1 = require("./user.const");
-const config_1 = __importDefault(require("../../config"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-//mongoose schema for user
+const mongoose_1 = require("mongoose");
+const config_1 = __importDefault(require("../../config"));
+const user_const_1 = require("./user.const");
 const userSchema = new mongoose_1.Schema({
     name: {
         type: String,
@@ -32,6 +31,7 @@ const userSchema = new mongoose_1.Schema({
     password: {
         type: String,
         minlength: [6, "Password must be at least 6 characters long!"],
+        required: [true, "Password is required to create a user!"],
     },
     role: {
         type: String,
@@ -85,12 +85,18 @@ userSchema.pre("save", function (next) {
     });
 });
 //removing password from document for security
-userSchema.post("save", function (doc, next) {
-    if (doc.password) {
-        doc.password = "";
-    }
-    next();
-});
+// userSchema.post("save", function (doc, next) {
+//   if (doc.password) {
+//     doc.password = "";
+//   }
+//   next();
+// });
+// Hide password in JSON output, but keep it in DB
+userSchema.methods.toJSON = function () {
+    const userObject = this.toObject();
+    delete userObject.password;
+    return userObject;
+};
 // Remove passwords from results
 userSchema.post("find", function (docs, next) {
     docs.forEach((doc) => {

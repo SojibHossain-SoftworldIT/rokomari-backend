@@ -6,7 +6,7 @@ const zod_1 = require("zod");
 const categoryAndTagsZodSchema = zod_1.z.object({
     publisher: zod_1.z.string({ error: "Publisher ID is required!" }),
     categories: zod_1.z.array(zod_1.z.string()).min(1, "At least one category is required!"),
-    tags: zod_1.z.array(zod_1.z.string()).optional(),
+    tags: zod_1.z.array(zod_1.z.string()).min(1, "At least one tag is required!"),
 });
 // description validation
 const descriptionZodSchema = zod_1.z.object({

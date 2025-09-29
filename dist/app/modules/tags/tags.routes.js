@@ -10,4 +10,6 @@ const router = express_1.default.Router();
 router.get("/", tags_controllers_1.tagControllers.getAllTags);
 router.get("/:id", tags_controllers_1.tagControllers.getSingleTag);
 router.post("/create-tag", tags_controllers_1.tagControllers.createTag);
+router.delete("/delete-tag/:id", tags_controllers_1.tagControllers.deleteTag);
+router.patch("/update-tag/:id", tags_controllers_1.tagControllers.updateTag);
 exports.TagRoutes = router;

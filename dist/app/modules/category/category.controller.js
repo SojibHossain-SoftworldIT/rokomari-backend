@@ -13,16 +13,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.categoryControllers = void 0;
+const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const category_service_1 = require("./category.service");
-const http_status_1 = __importDefault(require("http-status"));
 const getAllCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield category_service_1.categoryServices.getAllCategoryFromDB();
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
-        message: "Categories retrieve successfully!",
+        message: "Categories retrieved successfully!",
         data: result,
     });
 }));
@@ -32,17 +32,35 @@ const getSingleCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
-        message: "Category retrieve successfully!",
+        message: "Category retrieved successfully!",
         data: result,
     });
 }));
 const createCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const categoryData = req.body;
+    var _a, _b;
+    const files = req.files || {};
+    const categoryData = Object.assign(Object.assign({}, req.body), { image: ((_b = (_a = files["imageFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) || req.body.image || "" });
     const result = yield category_service_1.categoryServices.createCategoryIntoDB(categoryData);
     (0, sendResponse_1.default)(res, {
         success: true,
-        statusCode: http_status_1.default.OK,
+        statusCode: http_status_1.default.CREATED,
         message: "Category created successfully!",
+        data: result,
+    });
+}));
+const updateCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const id = req.params.id;
+    const files = req.files || {};
+    const updatedData = Object.assign({}, req.body);
+    if ((_b = (_a = files["imageFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) {
+        updatedData.image = files["imageFile"][0].path;
+    }
+    const result = yield category_service_1.categoryServices.updateCategoryInDB(id, updatedData);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Category updated successfully!",
         data: result,
     });
 }));
@@ -60,5 +78,6 @@ exports.categoryControllers = {
     getAllCategory,
     getSingleCategory,
     createCategory,
+    updateCategory,
     deleteCategory,
 };

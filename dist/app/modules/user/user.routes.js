@@ -29,4 +29,5 @@ router.get("/admins/:id",
 user_controller_1.UserControllers.getSuperAdmin);
 router.get("/:id", user_controller_1.UserControllers.getSingleUser);
 router.patch("/:id", user_controller_1.UserControllers.updateUser);
+router.delete("/:id", user_controller_1.UserControllers.deleteSingleUser);
 exports.UserRoutes = router;

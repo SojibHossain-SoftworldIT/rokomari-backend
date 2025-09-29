@@ -13,12 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.orderServices = void 0;
+const http_status_1 = __importDefault(require("http-status"));
+const nanoid_1 = require("nanoid");
 const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const handleAppError_1 = __importDefault(require("../../errors/handleAppError"));
-const http_status_1 = __importDefault(require("http-status"));
-const order_model_1 = require("./order.model");
 const order_consts_1 = require("./order.consts");
-const nanoid_1 = require("nanoid");
+const order_model_1 = require("./order.model");
 const getAllOrdersFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
     const orderQuery = new QueryBuilder_1.default(order_model_1.OrderModel.find(), query)
         .search(order_consts_1.OrderSearchableFields)
