@@ -5,11 +5,10 @@ import { tagServices } from "./tags.services";
 
 const getAllTags = catchAsync(async (req, res) => {
   const result = await tagServices.getAllTagsFromDB();
-
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Tags retrieve successfully!",
+    message: "Tags retrieved successfully!",
     data: result,
   });
 });
@@ -17,22 +16,28 @@ const getAllTags = catchAsync(async (req, res) => {
 const getSingleTag = catchAsync(async (req, res) => {
   const id = req.params.id;
   const result = await tagServices.getSingleTagFromDB(id);
-
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Tag data retrieve successfully!",
+    message: "Tag retrieved successfully!",
     data: result,
   });
 });
 
 const createTag = catchAsync(async (req, res) => {
-  const tagData = req.body;
+  const files =
+    (req.files as { [fieldname: string]: Express.Multer.File[] }) || {};
+
+  const tagData = {
+    ...req.body,
+    image: files["imageFile"]?.[0]?.path || req.body.image || "",
+  };
+
   const result = await tagServices.createTagOnDB(tagData);
 
   sendResponse(res, {
     success: true,
-    statusCode: httpStatus.OK,
+    statusCode: httpStatus.CREATED,
     message: "Tag created successfully!",
     data: result,
   });
@@ -40,8 +45,15 @@ const createTag = catchAsync(async (req, res) => {
 
 const updateTag = catchAsync(async (req, res) => {
   const id = req.params.id;
-  const tagData = req.body;
-  const result = await tagServices.updateTagInDB(id, tagData);
+  const files =
+    (req.files as { [fieldname: string]: Express.Multer.File[] }) || {};
+
+  const updatedData: any = { ...req.body };
+  if (files["imageFile"]?.[0]?.path) {
+    updatedData.image = files["imageFile"][0].path;
+  }
+
+  const result = await tagServices.updateTagInDB(id, updatedData);
 
   sendResponse(res, {
     success: true,
@@ -51,11 +63,9 @@ const updateTag = catchAsync(async (req, res) => {
   });
 });
 
-//delete a single tag
 const deleteTag = catchAsync(async (req, res) => {
   const id = req.params.id;
   const result = await tagServices.deleteTagFromDB(id);
-
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
