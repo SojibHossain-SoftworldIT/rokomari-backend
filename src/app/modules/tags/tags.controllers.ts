@@ -38,6 +38,19 @@ const createTag = catchAsync(async (req, res) => {
   });
 });
 
+const updateTag = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const tagData = req.body;
+  const result = await tagServices.updateTagInDB(id, tagData);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Tag updated successfully!",
+    data: result,
+  });
+});
+
 //delete a single tag
 const deleteTag = catchAsync(async (req, res) => {
   const id = req.params.id;
@@ -55,5 +68,6 @@ export const tagControllers = {
   getAllTags,
   getSingleTag,
   createTag,
+  updateTag,
   deleteTag,
 };

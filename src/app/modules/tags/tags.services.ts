@@ -29,6 +29,30 @@ const createTagOnDB = async (payload: TTag) => {
   return result;
 };
 
+//update single tag
+const updateTagInDB = async (id: string, payload: Partial<TTag>) => {
+  const isTagExists = await TagModel.findOne({ name: payload?.name });
+
+  //creating slug
+  if (payload.name) {
+    payload.slug = payload.name.split(" ").join("-").toLowerCase();
+  }
+
+  if (isTagExists) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      `Tag with ${isTagExists?.name} is already exists!`
+    );
+  }
+
+  const result = await TagModel.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+
+  return result;
+};
+
+//delete single tag
 const deleteTagFromDB = async (id: string) => {
   const result = await TagModel.findByIdAndDelete(id);
   return result;
@@ -37,6 +61,7 @@ const deleteTagFromDB = async (id: string) => {
 export const tagServices = {
   getAllTagsFromDB,
   getSingleTagFromDB,
+  updateTagInDB,
   deleteTagFromDB,
   createTagOnDB,
 };
