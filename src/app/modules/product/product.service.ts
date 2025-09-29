@@ -148,10 +148,53 @@ const deleteSingleProductOnDB = async (id: string) => {
   }
 };
 
+// search products
+const searchProductsFromDB = async (query: string) => {
+  if (!query) return [];
+
+  // Exact match query
+  const exactMatch = await ProductModel.find({
+    $or: [
+      { "description.name": query },
+      { "description.slug": query },
+      { "productInfo.sku": query },
+      { "bookInfo.specification.isbn": query },
+    ],
+  })
+    .limit(10)
+    .populate("categoryAndTags.categories")
+    .populate("categoryAndTags.tags")
+    .populate("categoryAndTags.publisher");
+
+  if (exactMatch.length > 0) return exactMatch;
+
+  // Partial match (case-insensitive)
+  const partialMatch = await ProductModel.find({
+    $or: [
+      { "description.name": { $regex: query, $options: "i" } },
+      { "description.slug": { $regex: query, $options: "i" } },
+      { "description.description": { $regex: query, $options: "i" } },
+      {
+        "bookInfo.specification.authors.name": { $regex: query, $options: "i" },
+      },
+      { "bookInfo.specification.publisher": { $regex: query, $options: "i" } },
+      { "bookInfo.specification.language": { $regex: query, $options: "i" } },
+      { "bookInfo.genre": { $regex: query, $options: "i" } },
+    ],
+  })
+    .limit(10)
+    .populate("categoryAndTags.categories")
+    .populate("categoryAndTags.tags")
+    .populate("categoryAndTags.publisher");
+
+  return partialMatch;
+};
+
 export const productServices = {
   createProductOnDB,
   getAllProductFromDB,
   deleteSingleProductOnDB,
+  searchProductsFromDB,
   getProductsByCategoryandTag,
   getSingleProductFromDB,
   updateProductOnDB,
