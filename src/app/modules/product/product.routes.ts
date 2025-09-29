@@ -11,6 +11,8 @@ const router = express.Router();
 
 router.get("/", productControllers.getAllProduct);
 
+router.get("/search", productControllers.searchProducts);
+
 router.get("/:id", productControllers.getSingleProduct);
 
 router.get("/products/by", productControllers.getProductsByCategoryandTag);

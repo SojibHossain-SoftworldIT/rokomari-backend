@@ -131,10 +131,26 @@ const deleteSingleProduct = catchAsync(async (req, res) => {
   });
 });
 
+const searchProducts = catchAsync(async (req, res) => {
+  const { q } = req.query;
+
+  const result = await productServices.searchProductsFromDB(q as string);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: result.length
+      ? "Products retrieved successfully!"
+      : "No products found!",
+    data: result,
+  });
+});
+
 export const productControllers = {
   createProduct,
   getSingleProduct,
   deleteSingleProduct,
+  searchProducts,
   getAllProduct,
   updateProduct,
   getProductsByCategoryandTag,
