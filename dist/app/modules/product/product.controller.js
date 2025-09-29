@@ -109,10 +109,23 @@ const deleteSingleProduct = (0, catchAsync_1.default)((req, res) => __awaiter(vo
         data: result,
     });
 }));
+const searchProducts = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { q } = req.query;
+    const result = yield product_service_1.productServices.searchProductsFromDB(q);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: result.length
+            ? "Products retrieved successfully!"
+            : "No products found!",
+        data: result,
+    });
+}));
 exports.productControllers = {
     createProduct,
     getSingleProduct,
     deleteSingleProduct,
+    searchProducts,
     getAllProduct,
     updateProduct,
     getProductsByCategoryandTag,
