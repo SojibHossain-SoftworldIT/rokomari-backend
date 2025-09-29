@@ -1,7 +1,7 @@
-import AppError from "../../errors/handleAppError";
 import httpStatus from "http-status";
-import { TagModel } from "./tags.model";
+import AppError from "../../errors/handleAppError";
 import { TTag } from "./tags.interface";
+import { TagModel } from "./tags.model";
 
 const getAllTagsFromDB = async () => {
   const result = await TagModel.find();
@@ -29,8 +29,14 @@ const createTagOnDB = async (payload: TTag) => {
   return result;
 };
 
+const deleteTagFromDB = async (id: string) => {
+  const result = await TagModel.findByIdAndDelete(id);
+  return result;
+};
+
 export const tagServices = {
   getAllTagsFromDB,
   getSingleTagFromDB,
+  deleteTagFromDB,
   createTagOnDB,
 };

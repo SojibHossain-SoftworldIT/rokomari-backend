@@ -1,6 +1,6 @@
+import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import httpStatus from "http-status";
 import { tagServices } from "./tags.services";
 
 const getAllTags = catchAsync(async (req, res) => {
@@ -38,8 +38,22 @@ const createTag = catchAsync(async (req, res) => {
   });
 });
 
+//delete a single tag
+const deleteTag = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const result = await tagServices.deleteTagFromDB(id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Tag deleted successfully!",
+    data: result,
+  });
+});
+
 export const tagControllers = {
   getAllTags,
   getSingleTag,
   createTag,
+  deleteTag,
 };
