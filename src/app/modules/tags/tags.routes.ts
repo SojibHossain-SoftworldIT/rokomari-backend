@@ -9,4 +9,7 @@ router.get("/:id", tagControllers.getSingleTag);
 
 router.post("/create-tag", tagControllers.createTag);
 
+router.delete("/delete-tag/:id", tagControllers.deleteTag);
+router.patch("/update-tag/:id", tagControllers.updateTag);
+
 export const TagRoutes = router;
