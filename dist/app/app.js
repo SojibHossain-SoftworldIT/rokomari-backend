@@ -23,6 +23,7 @@ app.use((0, cors_1.default)({
         "https://www.bdmbazar.com",
         "https://rokomari-admin-panel.vercel.app",
         "https://www.bdmbazar.com",
+        "https://admin.bdmbazar.com",
     ],
     credentials: true,
 }));
