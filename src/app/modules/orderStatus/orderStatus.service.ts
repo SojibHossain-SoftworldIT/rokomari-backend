@@ -1,9 +1,10 @@
+import httpStatus from "http-status";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/handleAppError";
-import httpStatus from "http-status";
-import { OrderStatus } from "./orderStatus.model";
-import { TOrderStatus } from "./orderStatus.interface";
+import { OrderModel } from "../order/order.model";
 import { OrderStatusSearchableFields } from "./orderStatus.const";
+import { TOrderStatus } from "./orderStatus.interface";
+import { OrderStatus } from "./orderStatus.model";
 
 const getAllOrderStatusFromDB = async (query: Record<string, unknown>) => {
   const orderStatusQuery = new QueryBuilder(OrderStatus.find(), query)
@@ -18,7 +19,6 @@ const getAllOrderStatusFromDB = async (query: Record<string, unknown>) => {
   return result;
 };
 
-
 const getSingleOrderStatusFromDB = async (id: string) => {
   const result = await OrderStatus.findById(id);
 
@@ -29,13 +29,11 @@ const getSingleOrderStatusFromDB = async (id: string) => {
   return result;
 };
 
-
 const createOrderStatusIntoDB = async (payload: TOrderStatus) => {
   const result = await OrderStatus.create(payload);
 
   return result;
 };
-
 
 const updateOrderStatusInDB = async (
   id: string,
@@ -51,6 +49,28 @@ const updateOrderStatusInDB = async (
   }
 
   return result;
+};
+
+const getMyOrderStatusesFromDB = async (customerId: string) => {
+  // Find orders where this user is the buyer
+  const orders = await OrderModel.find({
+    "orderInfo.orderBy": customerId,
+  }).select("orderInfo _id createdAt totalAmount paymentInfo");
+
+  // Map only status + tracking + orderId for frontend
+  const myStatuses = orders.flatMap((order) =>
+    order.orderInfo.map((info) => ({
+      orderId: order._id,
+      trackingNumber: info.trackingNumber,
+      status: info.status,
+      isCancelled: info.isCancelled,
+      createdAt: order.get("createdAt"),
+      totalAmount: order.totalAmount,
+      paymentInfo: order.paymentInfo,
+    }))
+  );
+
+  return myStatuses;
 };
 
 // 🔹 Delete OrderStatus
@@ -69,5 +89,6 @@ export const orderStatusServices = {
   getSingleOrderStatusFromDB,
   createOrderStatusIntoDB,
   updateOrderStatusInDB,
+  getMyOrderStatusesFromDB,
   deleteOrderStatusFromDB,
 };

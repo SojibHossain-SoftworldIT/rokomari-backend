@@ -1,6 +1,6 @@
+import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import httpStatus from "http-status";
 import { orderStatusServices } from "./orderStatus.service";
 
 // 🔹 Get all OrderStatus
@@ -60,6 +60,18 @@ const updateOrderStatus = catchAsync(async (req, res) => {
   });
 });
 
+export const getMyOrderStatuses = catchAsync(async (req, res) => {
+  const { customerId } = req.params;
+
+  const result = await orderStatusServices.getMyOrderStatusesFromDB(customerId);
+
+  res.status(200).json({
+    success: true,
+    message: "My order statuses retrieved successfully!",
+    data: result,
+  });
+});
+
 // 🔹 Delete OrderStatus
 const deleteOrderStatus = catchAsync(async (req, res) => {
   const id = req.params.id;
@@ -76,6 +88,7 @@ const deleteOrderStatus = catchAsync(async (req, res) => {
 export const orderStatusControllers = {
   getAllOrderStatus,
   getSingleOrderStatus,
+  getMyOrderStatuses,
   createOrderStatus,
   updateOrderStatus,
   deleteOrderStatus,
