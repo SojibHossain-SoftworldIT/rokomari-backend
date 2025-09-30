@@ -8,6 +8,10 @@ const router = express.Router();
 router.get("/", orderStatusControllers.getAllOrderStatus);
 
 router.get("/:id", orderStatusControllers.getSingleOrderStatus);
+router.get(
+  "/my-statuses/:customerId",
+  orderStatusControllers.getMyOrderStatuses
+);
 
 router.post(
   "/create-order-status",
