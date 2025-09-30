@@ -19,12 +19,13 @@ const getAllOrdersFromDB = async (query: Record<string, unknown>) => {
   return result;
 };
 
+//get my orders
 const getMyOrdersFromDB = async (
   customerId: string,
   query: Record<string, unknown>
 ) => {
   const orderQuery = new QueryBuilder(
-    OrderModel.find({ "orderInfo.customerInfo": customerId }),
+    OrderModel.find({ "orderInfo.orderBy": customerId }), // ✅ fixed
     query
   )
     .search(OrderSearchableFields)
