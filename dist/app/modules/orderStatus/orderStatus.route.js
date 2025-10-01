@@ -11,11 +11,12 @@ const orderStatus_validations_1 = require("./orderStatus.validations");
 const router = express_1.default.Router();
 router.get("/", orderStatus_controller_1.orderStatusControllers.getAllOrderStatus);
 router.get("/:id", orderStatus_controller_1.orderStatusControllers.getSingleOrderStatus);
-router.post("/create-order-status", (0, validateRequest_1.default)(orderStatus_validations_1.createOrderStatusZodSchema), orderStatus_controller_1.orderStatusControllers.createOrderStatus);
-// router.patch(
-//   "/:id",
+router.get("/my-order-statuses/:customerId", orderStatus_controller_1.orderStatusControllers.getMyOrderStatuses);
+// router.post(
+//   "/create-order-status",
 //   validateRequest(createOrderStatusZodSchema),
-//   orderStatusControllers.updateOrderStatus
+//   orderStatusControllers.createOrderStatus
 // );
+router.patch("/:id", (0, validateRequest_1.default)(orderStatus_validations_1.createOrderStatusZodSchema), orderStatus_controller_1.orderStatusControllers.updateOrderStatus);
 // router.delete("/:id", orderStatusControllers.deleteOrderStatus);
 exports.OrderStatusRoutes = router;

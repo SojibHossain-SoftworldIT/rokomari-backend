@@ -29,8 +29,10 @@ const getAllOrdersFromDB = (query) => __awaiter(void 0, void 0, void 0, function
     const result = yield orderQuery.modelQuery;
     return result;
 });
+//get my orders
 const getMyOrdersFromDB = (customerId, query) => __awaiter(void 0, void 0, void 0, function* () {
-    const orderQuery = new QueryBuilder_1.default(order_model_1.OrderModel.find({ "orderInfo.customerInfo": customerId }), query)
+    const orderQuery = new QueryBuilder_1.default(order_model_1.OrderModel.find({ "orderInfo.orderBy": customerId }), // ✅ fixed
+    query)
         .search(order_consts_1.OrderSearchableFields)
         .filter()
         .sort()

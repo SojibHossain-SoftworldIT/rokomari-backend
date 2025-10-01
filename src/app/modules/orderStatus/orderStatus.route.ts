@@ -8,22 +8,23 @@ const router = express.Router();
 router.get("/", orderStatusControllers.getAllOrderStatus);
 
 router.get("/:id", orderStatusControllers.getSingleOrderStatus);
+
 router.get(
-  "/my-statuses/:customerId",
+  "/my-order-statuses/:customerId",
   orderStatusControllers.getMyOrderStatuses
 );
 
-router.post(
-  "/create-order-status",
-  validateRequest(createOrderStatusZodSchema),
-  orderStatusControllers.createOrderStatus
-);
-
-// router.patch(
-//   "/:id",
+// router.post(
+//   "/create-order-status",
 //   validateRequest(createOrderStatusZodSchema),
-//   orderStatusControllers.updateOrderStatus
+//   orderStatusControllers.createOrderStatus
 // );
+
+router.patch(
+  "/:id",
+  validateRequest(createOrderStatusZodSchema),
+  orderStatusControllers.updateOrderStatus
+);
 
 // router.delete("/:id", orderStatusControllers.deleteOrderStatus);
 
