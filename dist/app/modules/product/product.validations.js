@@ -44,6 +44,7 @@ const productInfoZodSchema = zod_1.z.object({
     isExternal: zod_1.z.boolean().optional(),
     external: externalZodSchema.optional(),
     discount: zod_1.z.number().optional(),
+    totalDiscount: zod_1.z.number().optional(),
     status: zod_1.z.enum(["draft", "publish", "low-quantity", "out-of-stock"]),
     publicationDate: zod_1.z.string().optional(),
     isOnSale: zod_1.z.boolean().optional(),

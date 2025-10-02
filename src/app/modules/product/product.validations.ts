@@ -69,7 +69,10 @@ const specificationZodSchema = z.object({
   country: z.string({ error: "Country is required!" }),
   language: z.string({ error: "Language is required!" }),
   isbn: z.string().optional(),
-  binding: z.enum(["hardcover", "paperback"]).optional(),
+  binding: z.preprocess(
+    (val) => (typeof val === "string" ? val.toLowerCase() : val),
+    z.enum(["hardcover", "paperback"]).optional()
+  ),
 });
 
 // bookInfo validation
