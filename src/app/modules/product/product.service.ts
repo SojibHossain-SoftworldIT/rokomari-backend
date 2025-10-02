@@ -5,7 +5,26 @@ import { ProductSearchableFields } from "./product.const";
 import { TProduct } from "./product.interface";
 import { ProductModel } from "./product.model";
 
+//normalize binding input
+const normalizeBinding = (binding?: string) => {
+  if (!binding) return binding;
+  return binding.toLowerCase();
+};
+
+// const createProductOnDB = async (payload: TProduct) => {
+//   const result = await ProductModel.create(payload);
+//   return result;
+// };
+
+// 🔹 Create product
 const createProductOnDB = async (payload: TProduct) => {
+  // Ensure salePrice is defined if isOnSale is true
+  if (payload.bookInfo?.specification?.binding) {
+    payload.bookInfo.specification.binding = normalizeBinding(
+      payload.bookInfo.specification.binding
+    ) as "hardcover" | "paperback";
+  }
+
   const result = await ProductModel.create(payload);
   return result;
 };
@@ -98,6 +117,13 @@ const updateProductOnDB = async (
   const isProductExist = await ProductModel.findById(id);
   if (!isProductExist) {
     throw new AppError(404, "Product not found!");
+  }
+
+  // Normalize binding
+  if (updatedData.bookInfo?.specification?.binding) {
+    updatedData.bookInfo.specification.binding = normalizeBinding(
+      updatedData.bookInfo.specification.binding
+    ) as "hardcover" | "paperback";
   }
 
   // handle gallery update with deletedImages

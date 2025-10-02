@@ -45,6 +45,7 @@ const productInfoZodSchema = z.object({
   isExternal: z.boolean().optional(),
   external: externalZodSchema.optional(),
   discount: z.number().optional(),
+  totalDiscount: z.number().optional(),
   status: z.enum(["draft", "publish", "low-quantity", "out-of-stock"]),
   publicationDate: z.string().optional(),
   isOnSale: z.boolean().optional(),
@@ -68,7 +69,10 @@ const specificationZodSchema = z.object({
   country: z.string({ error: "Country is required!" }),
   language: z.string({ error: "Language is required!" }),
   isbn: z.string().optional(),
-  binding: z.enum(["hardcover", "paperback"]).optional(),
+  binding: z.preprocess(
+    (val) => (typeof val === "string" ? val.toLowerCase() : val),
+    z.enum(["hardcover", "paperback"]).optional()
+  ),
 });
 
 // bookInfo validation

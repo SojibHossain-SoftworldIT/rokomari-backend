@@ -45,6 +45,7 @@ export type TProductInfo = {
   isExternal?: boolean;
   external?: TExternal;
   discount?: number;
+  totalDiscount?: number;
   status: "draft" | "publish" | "low-quantity" | "out-of-stock";
   publicationDate?: Date;
   isOnSale?: boolean;

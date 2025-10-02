@@ -2,6 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductModel = void 0;
 const mongoose_1 = require("mongoose");
+// Helper function for discount calculation
+const calculateDiscount = (price, salePrice) => {
+    if (!salePrice || salePrice <= 0)
+        return 0;
+    return Math.round(((price - salePrice) / price) * 100);
+};
 // Category & Tags Schema
 // const categoryAndTagsSchema = new Schema<TCategoryAndTags>(
 //   {
@@ -55,6 +61,7 @@ const productInfoSchema = new mongoose_1.Schema({
     isExternal: Boolean,
     external: externalSchema,
     discount: { type: Number, default: 0 },
+    totalDiscount: { type: Number, default: 0 },
     status: {
         type: String,
         enum: ["draft", "publish", "low-quantity", "out-of-stock"],
@@ -113,4 +120,32 @@ const productSchema = new mongoose_1.Schema({
     wishlistCount: { type: Number, default: 0 },
     soldCount: { type: Number, default: 0 },
 }, { timestamps: true });
+// 🔹 Pre-save middleware
+productSchema.pre("save", function (next) {
+    var _a, _b;
+    if (this.productInfo) {
+        this.productInfo.totalDiscount = calculateDiscount(this.productInfo.price, this.productInfo.salePrice);
+    }
+    if ((_b = (_a = this.bookInfo) === null || _a === void 0 ? void 0 : _a.specification) === null || _b === void 0 ? void 0 : _b.binding) {
+        this.bookInfo.specification.binding =
+            this.bookInfo.specification.binding.toLowerCase();
+    }
+    next();
+});
+// 🔹 Pre-findOneAndUpdate middleware
+productSchema.pre("findOneAndUpdate", function (next) {
+    var _a, _b, _c, _d;
+    const update = this.getUpdate();
+    if (((_a = update === null || update === void 0 ? void 0 : update.productInfo) === null || _a === void 0 ? void 0 : _a.price) !== undefined) {
+        const price = update.productInfo.price;
+        const salePrice = (_b = update.productInfo.salePrice) !== null && _b !== void 0 ? _b : 0;
+        update.productInfo.totalDiscount = calculateDiscount(price, salePrice);
+    }
+    if ((_d = (_c = update === null || update === void 0 ? void 0 : update.bookInfo) === null || _c === void 0 ? void 0 : _c.specification) === null || _d === void 0 ? void 0 : _d.binding) {
+        update.bookInfo.specification.binding =
+            update.bookInfo.specification.binding.toLowerCase();
+    }
+    this.setUpdate(update);
+    next();
+});
 exports.ProductModel = (0, mongoose_1.model)("Product", productSchema);
