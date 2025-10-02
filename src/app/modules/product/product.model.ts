@@ -1,4 +1,11 @@
 import { model, Schema } from "mongoose";
+
+// Helper function for discount calculation
+const calculateDiscount = (price: number, salePrice?: number) => {
+  if (!salePrice || salePrice <= 0) return 0;
+  return Math.round(((price - salePrice) / price) * 100);
+};
+
 import {
   TAuthor,
   TBookInfo,
@@ -76,6 +83,7 @@ const productInfoSchema = new Schema<TProductInfo>(
     isExternal: Boolean,
     external: externalSchema,
     discount: { type: Number, default: 0 },
+    totalDiscount: { type: Number, default: 0 },
     status: {
       type: String,
       enum: ["draft", "publish", "low-quantity", "out-of-stock"],
@@ -152,5 +160,44 @@ const productSchema = new Schema<TProduct>(
   },
   { timestamps: true }
 );
+
+// 🔹 Pre-save middleware
+productSchema.pre("save", function (next) {
+  if (this.productInfo) {
+    this.productInfo.totalDiscount = calculateDiscount(
+      this.productInfo.price,
+      this.productInfo.salePrice
+    );
+  }
+
+  if (this.bookInfo?.specification?.binding) {
+    this.bookInfo.specification.binding =
+      this.bookInfo.specification.binding.toLowerCase() as
+        | "hardcover"
+        | "paperback";
+  }
+
+  next();
+});
+
+// 🔹 Pre-findOneAndUpdate middleware
+productSchema.pre("findOneAndUpdate", function (next) {
+  const update = this.getUpdate() as any;
+
+  if (update?.productInfo?.price !== undefined) {
+    const price = update.productInfo.price;
+    const salePrice = update.productInfo.salePrice ?? 0;
+
+    update.productInfo.totalDiscount = calculateDiscount(price, salePrice);
+  }
+
+  if (update?.bookInfo?.specification?.binding) {
+    update.bookInfo.specification.binding =
+      update.bookInfo.specification.binding.toLowerCase();
+  }
+
+  this.setUpdate(update);
+  next();
+});
 
 export const ProductModel = model<TProduct>("Product", productSchema);
