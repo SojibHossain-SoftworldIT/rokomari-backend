@@ -60,6 +60,22 @@ const customerInfoZodSchema = z.object({
         ? "Phone number is required!"
         : "Must be a string!",
   }),
+  alphone: z.string().optional(),
+  pickupLocation: z.string({
+    error: (issue) =>
+      issue.input === undefined
+        ? "Pickup location is required!"
+        : "Must be a string!",
+  }),
+  area: z.string({
+    error: (issue) =>
+      issue.input === undefined ? "Area is required!" : "Must be a string!",
+  }),
+  zone: z.string({
+    error: (issue) =>
+      issue.input === undefined ? "Zone is required!" : "Must be a string!",
+  }),
+
   address: z.string({
     error: (issue) =>
       issue.input === undefined ? "Address is required!" : "Must be a string!",

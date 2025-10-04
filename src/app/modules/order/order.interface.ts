@@ -16,12 +16,16 @@ export type TTotalAmount = {
 export type TCustomerInfo = {
   firstName: string;
   lastName: string;
+  pickupLocation: string;
   email: string;
   phone: string;
+  altPhone?: string;
   address: string;
-  city: string;
-  postalCode: string;
   country: string;
+  city: string;
+  area: string;
+  zone: string;
+  postalCode: string;
 };
 
 export type TPaymentInfo = {
