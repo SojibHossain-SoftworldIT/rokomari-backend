@@ -66,7 +66,7 @@ const specificationZodSchema = zod_1.z.object({
     country: zod_1.z.string({ error: "Country is required!" }),
     language: zod_1.z.string({ error: "Language is required!" }),
     isbn: zod_1.z.string().optional(),
-    binding: zod_1.z.enum(["hardcover", "paperback"]).optional(),
+    binding: zod_1.z.preprocess((val) => (typeof val === "string" ? val.toLowerCase() : val), zod_1.z.enum(["hardcover", "paperback"]).optional()),
 });
 // bookInfo validation
 exports.bookInfoZodSchema = zod_1.z.object({

@@ -52,7 +52,6 @@ const deleteImageFromCLoudinary = (url) => __awaiter(void 0, void 0, void 0, fun
     try {
         const regex = /\/v\d+\/(.*?)\.(jpg|jpeg|png|gif|webp)$/i;
         const match = url.match(regex);
-        console.log({ match });
         if (match && match[1]) {
             const public_id = match[1];
             yield cloudinary_1.v2.uploader.destroy(public_id);

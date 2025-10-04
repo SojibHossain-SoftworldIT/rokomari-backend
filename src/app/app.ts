@@ -20,7 +20,6 @@ app.use(
       "http://localhost:3001",
       "https://www.bdmbazar.com",
       "https://rokomari-admin-panel.vercel.app",
-      "https://www.bdmbazar.com",
       "https://admin.bdmbazar.com",
     ],
     credentials: true,
