@@ -43,8 +43,15 @@ const customerInfoSchema = new mongoose_1.Schema({
     lastName: { type: String, required: [true, "Last name is required!"] },
     email: { type: String, required: [true, "Email is required!"] },
     phone: { type: String, required: [true, "Phone number is required!"] },
-    address: { type: String, required: [true, "Address is required!"] },
+    altPhone: { type: String },
+    pickupLocation: {
+        type: String,
+        required: [true, "Pickup location is required!"],
+    },
     city: { type: String, required: [true, "City is required!"] },
+    area: { type: String, required: [true, "Area is required!"] },
+    zone: { type: String },
+    address: { type: String, required: [true, "Address is required!"] },
     postalCode: { type: String, required: [true, "Postal code is required!"] },
     country: { type: String, required: [true, "Country is required!"] },
 }, { _id: false });

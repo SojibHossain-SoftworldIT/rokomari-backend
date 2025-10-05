@@ -19,9 +19,9 @@ app.use(
       "http://localhost:3000",
       "http://localhost:3001",
       "https://www.bdmbazar.com",
+      "https://bdm-bazar.vercel.app",
       "https://rokomari-admin-panel.vercel.app",
       "https://www.bdmbazar.com",
-      "https://bdm-bazar.vercel.app",
     ],
     credentials: true,
   })

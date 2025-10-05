@@ -84,12 +84,7 @@ const customerInfoZodSchema = z.object({
     error: (issue) =>
       issue.input === undefined ? "City is required!" : "Must be a string!",
   }),
-  postalCode: z.string({
-    error: (issue) =>
-      issue.input === undefined
-        ? "Postal code is required!"
-        : "Must be a string!",
-  }),
+  postalCode: z.string().optional(),
   country: z.string({
     error: (issue) =>
       issue.input === undefined ? "Country is required!" : "Must be a string!",

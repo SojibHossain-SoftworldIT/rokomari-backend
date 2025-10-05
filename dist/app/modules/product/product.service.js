@@ -18,7 +18,23 @@ const cloudinary_config_1 = require("../../config/cloudinary.config");
 const handleAppError_1 = __importDefault(require("../../errors/handleAppError"));
 const product_const_1 = require("./product.const");
 const product_model_1 = require("./product.model");
+//normalize binding input
+const normalizeBinding = (binding) => {
+    if (!binding)
+        return binding;
+    return binding.toLowerCase();
+};
+// const createProductOnDB = async (payload: TProduct) => {
+//   const result = await ProductModel.create(payload);
+//   return result;
+// };
+// 🔹 Create product
 const createProductOnDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    // Ensure salePrice is defined if isOnSale is true
+    if ((_b = (_a = payload.bookInfo) === null || _a === void 0 ? void 0 : _a.specification) === null || _b === void 0 ? void 0 : _b.binding) {
+        payload.bookInfo.specification.binding = normalizeBinding(payload.bookInfo.specification.binding);
+    }
     const result = yield product_model_1.ProductModel.create(payload);
     return result;
 });
@@ -92,15 +108,19 @@ const getSingleProductFromDB = (id) => __awaiter(void 0, void 0, void 0, functio
         .populate("categoryAndTags.tags");
 });
 const updateProductOnDB = (id, updatedData) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a, _b, _c, _d;
     const isProductExist = yield product_model_1.ProductModel.findById(id);
     if (!isProductExist) {
         throw new handleAppError_1.default(404, "Product not found!");
     }
+    // Normalize binding
+    if ((_b = (_a = updatedData.bookInfo) === null || _a === void 0 ? void 0 : _a.specification) === null || _b === void 0 ? void 0 : _b.binding) {
+        updatedData.bookInfo.specification.binding = normalizeBinding(updatedData.bookInfo.specification.binding);
+    }
     // handle gallery update with deletedImages
     if (updatedData.deletedImages &&
         updatedData.deletedImages.length > 0 &&
-        ((_a = isProductExist.gallery) === null || _a === void 0 ? void 0 : _a.length)) {
+        ((_c = isProductExist.gallery) === null || _c === void 0 ? void 0 : _c.length)) {
         const restDBImages = isProductExist.gallery.filter((img) => { var _a; return !((_a = updatedData.deletedImages) === null || _a === void 0 ? void 0 : _a.includes(img)); });
         const updatedGalleryImages = (updatedData.gallery || [])
             .filter((img) => { var _a; return !((_a = updatedData.deletedImages) === null || _a === void 0 ? void 0 : _a.includes(img)); })
@@ -109,7 +129,7 @@ const updateProductOnDB = (id, updatedData) => __awaiter(void 0, void 0, void 0,
     }
     const updatedProduct = yield product_model_1.ProductModel.findByIdAndUpdate(id, { $set: updatedData }, { new: true, runValidators: true });
     // delete images from cloudinary
-    if (((_b = updatedData.deletedImages) === null || _b === void 0 ? void 0 : _b.length) > 0) {
+    if (((_d = updatedData.deletedImages) === null || _d === void 0 ? void 0 : _d.length) > 0) {
         yield Promise.all(updatedData.deletedImages.map((img) => (0, cloudinary_config_1.deleteImageFromCLoudinary)(img)));
     }
     if (updatedData.featuredImg && isProductExist.featuredImg) {

@@ -51,17 +51,25 @@ const customerInfoZodSchema = zod_1.z.object({
             ? "Phone number is required!"
             : "Must be a string!",
     }),
+    alphone: zod_1.z.string().optional(),
+    pickupLocation: zod_1.z.string({
+        error: (issue) => issue.input === undefined
+            ? "Pickup location is required!"
+            : "Must be a string!",
+    }),
+    area: zod_1.z.string({
+        error: (issue) => issue.input === undefined ? "Area is required!" : "Must be a string!",
+    }),
+    zone: zod_1.z.string({
+        error: (issue) => issue.input === undefined ? "Zone is required!" : "Must be a string!",
+    }),
     address: zod_1.z.string({
         error: (issue) => issue.input === undefined ? "Address is required!" : "Must be a string!",
     }),
     city: zod_1.z.string({
         error: (issue) => issue.input === undefined ? "City is required!" : "Must be a string!",
     }),
-    postalCode: zod_1.z.string({
-        error: (issue) => issue.input === undefined
-            ? "Postal code is required!"
-            : "Must be a string!",
-    }),
+    postalCode: zod_1.z.string().optional(),
     country: zod_1.z.string({
         error: (issue) => issue.input === undefined ? "Country is required!" : "Must be a string!",
     }),
