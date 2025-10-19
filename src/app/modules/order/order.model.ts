@@ -65,7 +65,7 @@ const customerInfoSchema = new Schema<TCustomerInfo>(
     },
     city: { type: String, required: [true, "City is required!"] },
     area: { type: String, required: [true, "Area is required!"] },
-    zone: { type: String, required: [true, "Zone is required!"] },
+    zone: { type: String },
     address: { type: String, required: [true, "Address is required!"] },
     postalCode: { type: String, required: [true, "Postal code is required!"] },
     country: { type: String, required: [true, "Country is required!"] },

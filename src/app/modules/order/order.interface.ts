@@ -25,7 +25,7 @@ export type TCustomerInfo = {
   city: string;
   area: string;
   zone: string;
-  postalCode: string;
+  postalCode?: string;
 };
 
 export type TPaymentInfo = {

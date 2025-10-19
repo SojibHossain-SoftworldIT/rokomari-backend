@@ -58,9 +58,21 @@ const createOrderIntoDB = async (payload: TOrder) => {
   return result;
 };
 
+const updateOrderInDB = async (id: string, payload: Partial<TOrder>) => {
+  const isExist = await OrderModel.findById(id);
+
+  if (!isExist) {
+    throw new AppError(httpStatus.NOT_FOUND, "Order does not exists!");
+  }
+
+  const result = await OrderModel.findByIdAndUpdate(id, payload, { new: true });
+  return result;
+};
+
 export const orderServices = {
   getAllOrdersFromDB,
   getSingleOrderFromDB,
   createOrderIntoDB,
+  updateOrderInDB,
   getMyOrdersFromDB,
 };
