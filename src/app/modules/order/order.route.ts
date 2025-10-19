@@ -17,4 +17,6 @@ router.post(
   orderControllers.createOrder
 );
 
+router.patch("/:id", orderControllers.updateOrder);
+
 export const OrderRoutes = router;
