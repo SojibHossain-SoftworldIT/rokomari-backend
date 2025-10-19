@@ -39,6 +39,17 @@ const getSingleOrder = catchAsync(async (req, res) => {
   });
 });
 
+const getOrderSummary = catchAsync(async (req, res) => {
+  const result = await orderServices.getOrderSummaryFromDB();
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Order summary retrieved successfully!",
+    data: result,
+  });
+});
+
 const createOrder = catchAsync(async (req, res) => {
   const orderData = req.body;
   const result = await orderServices.createOrderIntoDB(orderData);
@@ -71,4 +82,5 @@ export const orderControllers = {
   createOrder,
   updateOrder,
   getMyOrders,
+  getOrderSummary,
 };

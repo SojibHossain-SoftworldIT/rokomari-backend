@@ -39,6 +39,43 @@ const getMyOrdersFromDB = async (
   return result;
 };
 
+// Get order summary (pending/completed counts and totals)
+const getOrderSummaryFromDB = async () => {
+  // Aggregate orders data
+  const orders = await OrderModel.find();
+
+  // initialize counters
+  let totalOrders = orders.length;
+  let totalPendingOrders = 0;
+  let totalCompletedOrders = 0;
+  let totalPendingAmount = 0;
+  let totalCompletedAmount = 0;
+
+  // loop through all orders
+  orders.forEach((order) => {
+    if (Array.isArray(order.orderInfo) && order.orderInfo.length > 0) {
+      const status = order.orderInfo[0].status;
+      const total = order.totalAmount || 0;
+
+      if (status === "pending") {
+        totalPendingOrders++;
+        totalPendingAmount += total;
+      } else if (status === "completed") {
+        totalCompletedOrders++;
+        totalCompletedAmount += total;
+      }
+    }
+  });
+
+  return {
+    totalOrders,
+    totalPendingOrders,
+    totalCompletedOrders,
+    totalPendingAmount,
+    totalCompletedAmount,
+  };
+};
+
 const getSingleOrderFromDB = async (id: string) => {
   const result = OrderModel.findById(id);
 
@@ -74,5 +111,6 @@ export const orderServices = {
   getSingleOrderFromDB,
   createOrderIntoDB,
   updateOrderInDB,
+  getOrderSummaryFromDB,
   getMyOrdersFromDB,
 };
