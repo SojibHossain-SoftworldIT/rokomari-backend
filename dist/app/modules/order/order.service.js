@@ -41,6 +41,39 @@ const getMyOrdersFromDB = (customerId, query) => __awaiter(void 0, void 0, void 
     const result = yield orderQuery.modelQuery;
     return result;
 });
+// Get order summary (pending/completed counts and totals)
+const getOrderSummaryFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
+    // Aggregate orders data
+    const orders = yield order_model_1.OrderModel.find();
+    // initialize counters
+    let totalOrders = orders.length;
+    let totalPendingOrders = 0;
+    let totalCompletedOrders = 0;
+    let totalPendingAmount = 0;
+    let totalCompletedAmount = 0;
+    // loop through all orders
+    orders.forEach((order) => {
+        if (Array.isArray(order.orderInfo) && order.orderInfo.length > 0) {
+            const status = order.orderInfo[0].status;
+            const total = order.totalAmount || 0;
+            if (status === "pending") {
+                totalPendingOrders++;
+                totalPendingAmount += total;
+            }
+            else if (status === "completed") {
+                totalCompletedOrders++;
+                totalCompletedAmount += total;
+            }
+        }
+    });
+    return {
+        totalOrders,
+        totalPendingOrders,
+        totalCompletedOrders,
+        totalPendingAmount,
+        totalCompletedAmount,
+    };
+});
 const getSingleOrderFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = order_model_1.OrderModel.findById(id);
     if (!result) {
@@ -55,9 +88,19 @@ const createOrderIntoDB = (payload) => __awaiter(void 0, void 0, void 0, functio
     const result = yield order_model_1.OrderModel.create(payload);
     return result;
 });
+const updateOrderInDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const isExist = yield order_model_1.OrderModel.findById(id);
+    if (!isExist) {
+        throw new handleAppError_1.default(http_status_1.default.NOT_FOUND, "Order does not exists!");
+    }
+    const result = yield order_model_1.OrderModel.findByIdAndUpdate(id, payload, { new: true });
+    return result;
+});
 exports.orderServices = {
     getAllOrdersFromDB,
     getSingleOrderFromDB,
     createOrderIntoDB,
+    updateOrderInDB,
+    getOrderSummaryFromDB,
     getMyOrdersFromDB,
 };

@@ -46,6 +46,15 @@ const getSingleOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+const getOrderSummary = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield order_service_1.orderServices.getOrderSummaryFromDB();
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Order summary retrieved successfully!",
+        data: result,
+    });
+}));
 const createOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const orderData = req.body;
     const result = yield order_service_1.orderServices.createOrderIntoDB(orderData);
@@ -56,9 +65,22 @@ const createOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
         data: result,
     });
 }));
+const updateOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const updateData = req.body;
+    const result = yield order_service_1.orderServices.updateOrderInDB(id, updateData);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Order updated successfully!",
+        data: result,
+    });
+}));
 exports.orderControllers = {
     getAllOrder,
     getSingleOrder,
     createOrder,
+    updateOrder,
     getMyOrders,
+    getOrderSummary,
 };
