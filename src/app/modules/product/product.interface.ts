@@ -81,6 +81,7 @@ export type TBookInfo = {
 
 export type TProduct = {
   featuredImg: string;
+  previewImg?: string[];
   gallery?: string[];
   video?: string;
   categoryAndTags: TCategoriesAndTags;
