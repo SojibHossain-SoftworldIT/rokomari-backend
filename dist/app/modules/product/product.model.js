@@ -107,6 +107,7 @@ const bookInfoSchema = new mongoose_1.Schema({
 // Product Schema
 const productSchema = new mongoose_1.Schema({
     featuredImg: { type: String, required: true },
+    previewImg: [String],
     gallery: [String],
     video: String,
     categoryAndTags: { type: categoryAndTagsSchema, required: true },

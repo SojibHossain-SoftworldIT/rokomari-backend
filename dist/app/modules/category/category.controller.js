@@ -36,10 +36,44 @@ const getSingleCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void
         data: result,
     });
 }));
+// const createCategory = catchAsync(async (req, res) => {
+//   const files =
+//     (req.files as { [fieldname: string]: Express.Multer.File[] }) || {};
+//   const categoryData = {
+//     ...req.body,
+//     image: files["imageFile"]?.[0]?.path || req.body.image || "",
+//   };
+//   const result = await categoryServices.createCategoryIntoDB(categoryData);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.CREATED,
+//     message: "Category created successfully!",
+//     data: result,
+//   });
+// });
+// const updateCategory = catchAsync(async (req, res) => {
+//   const id = req.params.id;
+//   const files =
+//     (req.files as { [fieldname: string]: Express.Multer.File[] }) || {};
+//   const updatedData: any = { ...req.body };
+//   if (files["imageFile"]?.[0]?.path) {
+//     updatedData.image = files["imageFile"][0].path;
+//   }
+//   const result = await categoryServices.updateCategoryInDB(id, updatedData);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.OK,
+//     message: "Category updated successfully!",
+//     data: result,
+//   });
+// });
 const createCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a, _b, _c, _d, _e, _f;
     const files = req.files || {};
-    const categoryData = Object.assign(Object.assign({}, req.body), { image: ((_b = (_a = files["imageFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) || req.body.image || "" });
+    const categoryData = Object.assign(Object.assign({}, req.body), { image: ((_b = (_a = files["imageFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) || req.body.image || "", bannerImg: ((_d = (_c = files["bannerImgFile"]) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.path) || req.body.bannerImg || "", icon: {
+            name: req.body.iconName || "",
+            url: ((_f = (_e = files["iconFile"]) === null || _e === void 0 ? void 0 : _e[0]) === null || _f === void 0 ? void 0 : _f.path) || req.body.iconUrl || "",
+        } });
     const result = yield category_service_1.categoryServices.createCategoryIntoDB(categoryData);
     (0, sendResponse_1.default)(res, {
         success: true,
@@ -49,12 +83,21 @@ const createCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
     });
 }));
 const updateCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    const id = req.params.id;
+    var _a, _b, _c, _d, _e, _f;
+    const { id } = req.params;
     const files = req.files || {};
     const updatedData = Object.assign({}, req.body);
     if ((_b = (_a = files["imageFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) {
         updatedData.image = files["imageFile"][0].path;
+    }
+    if ((_d = (_c = files["bannerImgFile"]) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.path) {
+        updatedData.bannerImg = files["bannerImgFile"][0].path;
+    }
+    if ((_f = (_e = files["iconFile"]) === null || _e === void 0 ? void 0 : _e[0]) === null || _f === void 0 ? void 0 : _f.path) {
+        updatedData.icon = {
+            name: req.body.iconName || "",
+            url: files["iconFile"][0].path,
+        };
     }
     const result = yield category_service_1.categoryServices.updateCategoryInDB(id, updatedData);
     (0, sendResponse_1.default)(res, {

@@ -15,12 +15,14 @@ router.get("/search", product_controller_1.productControllers.searchProducts);
 router.get("/:id", product_controller_1.productControllers.getSingleProduct);
 router.get("/products/by", product_controller_1.productControllers.getProductsByCategoryandTag);
 router.post("/create-product", multer_config_1.multerUpload.fields([
-    { name: "galleryImagesFiles", maxCount: 20 },
+    { name: "galleryImagesFiles", maxCount: 5 },
     { name: "featuredImgFile", maxCount: 1 },
+    { name: "previewImgFile", maxCount: 20 },
 ]), (0, validateRequest_1.default)(product_validations_1.createProductZodSchema), product_controller_1.productControllers.createProduct);
 router.patch("/update-product/:id", multer_config_1.multerUpload.fields([
-    { name: "galleryImagesFiles", maxCount: 20 },
+    { name: "galleryImagesFiles", maxCount: 5 },
     { name: "featuredImgFile", maxCount: 1 },
+    { name: "previewImgFile", maxCount: 20 },
 ]), (0, validateRequest_1.default)(product_validations_1.updateProductZodSchema), product_controller_1.productControllers.updateProduct);
 router.delete("/delete-product/:id", product_controller_1.productControllers.deleteSingleProduct);
 exports.ProductRoutes = router;

@@ -36,10 +36,44 @@ const getSingleTag = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         data: result,
     });
 }));
+// const createTag = catchAsync(async (req, res) => {
+//   const files =
+//     (req.files as { [fieldname: string]: Express.Multer.File[] }) || {};
+//   const tagData = {
+//     ...req.body,
+//     image: files["imageFile"]?.[0]?.path || req.body.image || "",
+//   };
+//   const result = await tagServices.createTagOnDB(tagData);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.CREATED,
+//     message: "Tag created successfully!",
+//     data: result,
+//   });
+// });
+// const updateTag = catchAsync(async (req, res) => {
+//   const id = req.params.id;
+//   const files =
+//     (req.files as { [fieldname: string]: Express.Multer.File[] }) || {};
+//   const updatedData: any = { ...req.body };
+//   if (files["imageFile"]?.[0]?.path) {
+//     updatedData.image = files["imageFile"][0].path;
+//   }
+//   const result = await tagServices.updateTagInDB(id, updatedData);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.OK,
+//     message: "Tag updated successfully!",
+//     data: result,
+//   });
+// });
 const createTag = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a, _b, _c, _d;
     const files = req.files || {};
-    const tagData = Object.assign(Object.assign({}, req.body), { image: ((_b = (_a = files["imageFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) || req.body.image || "" });
+    const tagData = Object.assign(Object.assign({}, req.body), { image: ((_b = (_a = files["imageFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) || req.body.image || "", icon: {
+            name: req.body.iconName || "",
+            url: ((_d = (_c = files["iconFile"]) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.path) || req.body.iconUrl || "",
+        } });
     const result = yield tags_services_1.tagServices.createTagOnDB(tagData);
     (0, sendResponse_1.default)(res, {
         success: true,
@@ -49,12 +83,18 @@ const createTag = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
     });
 }));
 const updateTag = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    const id = req.params.id;
+    var _a, _b, _c, _d;
+    const { id } = req.params;
     const files = req.files || {};
     const updatedData = Object.assign({}, req.body);
     if ((_b = (_a = files["imageFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) {
         updatedData.image = files["imageFile"][0].path;
+    }
+    if ((_d = (_c = files["iconFile"]) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.path) {
+        updatedData.icon = {
+            name: req.body.iconName || "",
+            url: files["iconFile"][0].path,
+        };
     }
     const result = yield tags_services_1.tagServices.updateTagInDB(id, updatedData);
     (0, sendResponse_1.default)(res, {
