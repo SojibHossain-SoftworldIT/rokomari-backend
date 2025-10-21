@@ -145,6 +145,7 @@ const bookInfoSchema = new Schema<TBookInfo>(
 const productSchema = new Schema<TProduct>(
   {
     featuredImg: { type: String, required: true },
+    previewImg: [String],
     gallery: [String],
     video: String,
     categoryAndTags: { type: categoryAndTagsSchema, required: true },

@@ -20,8 +20,9 @@ router.get("/products/by", productControllers.getProductsByCategoryandTag);
 router.post(
   "/create-product",
   multerUpload.fields([
-    { name: "galleryImagesFiles", maxCount: 20 },
+    { name: "galleryImagesFiles", maxCount: 5 },
     { name: "featuredImgFile", maxCount: 1 },
+    { name: "previewImgFile", maxCount: 20 },
   ]),
   validateRequest(createProductZodSchema),
   productControllers.createProduct
@@ -30,8 +31,9 @@ router.post(
 router.patch(
   "/update-product/:id",
   multerUpload.fields([
-    { name: "galleryImagesFiles", maxCount: 20 },
+    { name: "galleryImagesFiles", maxCount: 5 },
     { name: "featuredImgFile", maxCount: 1 },
+    { name: "previewImgFile", maxCount: 20 },
   ]),
   validateRequest(updateProductZodSchema),
   productControllers.updateProduct

@@ -76,6 +76,9 @@ const createProduct = catchAsync(async (req, res) => {
     gallery: files["galleryImagesFiles"]
       ? files["galleryImagesFiles"].map((f) => f.path)
       : req.body.gallery || [],
+    previewImg: files["previewImgFile"]
+      ? files["previewImgFile"].map((f) => f.path)
+      : req.body.previewImg || [],
   };
 
   const result = await productServices.createProductOnDB(productData);
@@ -105,6 +108,9 @@ const updateProduct = catchAsync(async (req, res) => {
 
   if (files["galleryImagesFiles"]?.length) {
     updatedData.gallery = files["galleryImagesFiles"].map((f) => f.path);
+  }
+  if (files["previewImgFile"]?.length) {
+    updatedData.previewImg = files["previewImgFile"].map((f) => f.path);
   }
 
   const result = await productServices.updateProductOnDB(id, updatedData);
