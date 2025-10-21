@@ -91,26 +91,82 @@ const createProduct = catchAsync(async (req, res) => {
   });
 });
 
+// const updateProduct = catchAsync(async (req, res) => {
+//   const { id } = req.params;
+
+//   const files = req.files as {
+//     [fieldname: string]: Express.Multer.File[];
+//   };
+
+//   const updatedData: any = {
+//     ...req.body,
+//   };
+
+//   if (files["featuredImgFile"]?.[0]?.path) {
+//     updatedData.featuredImg = files["featuredImgFile"][0].path;
+//   }
+
+//   if (files["galleryImagesFiles"]?.length) {
+//     updatedData.gallery = files["galleryImagesFiles"].map((f) => f.path);
+//   }
+//   if (files["previewImgFile"]?.length) {
+//     updatedData.previewImg = files["previewImgFile"].map((f) => f.path);
+//   }
+
+//   const result = await productServices.updateProductOnDB(id, updatedData);
+
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.OK,
+//     message: "Product updated successfully!",
+//     data: result,
+//   });
+// });
+
+// Product delete controller
+
 const updateProduct = catchAsync(async (req, res) => {
   const { id } = req.params;
 
-  const files = req.files as {
-    [fieldname: string]: Express.Multer.File[];
-  };
+  const files =
+    (req.files as { [fieldname: string]: Express.Multer.File[] }) || {};
 
   const updatedData: any = {
     ...req.body,
   };
 
+  // ✅ Safely handle featured image
   if (files["featuredImgFile"]?.[0]?.path) {
     updatedData.featuredImg = files["featuredImgFile"][0].path;
+  } else if (req.body.featuredImg) {
+    updatedData.featuredImg = req.body.featuredImg;
   }
 
+  // ✅ Safely handle gallery
   if (files["galleryImagesFiles"]?.length) {
     updatedData.gallery = files["galleryImagesFiles"].map((f) => f.path);
+  } else if (req.body.gallery) {
+    // Handle JSON array (stringified or real array)
+    try {
+      updatedData.gallery = Array.isArray(req.body.gallery)
+        ? req.body.gallery
+        : JSON.parse(req.body.gallery);
+    } catch {
+      updatedData.gallery = [req.body.gallery];
+    }
   }
+
+  // ✅ Safely handle preview images
   if (files["previewImgFile"]?.length) {
     updatedData.previewImg = files["previewImgFile"].map((f) => f.path);
+  } else if (req.body.previewImg) {
+    try {
+      updatedData.previewImg = Array.isArray(req.body.previewImg)
+        ? req.body.previewImg
+        : JSON.parse(req.body.previewImg);
+    } catch {
+      updatedData.previewImg = [req.body.previewImg];
+    }
   }
 
   const result = await productServices.updateProductOnDB(id, updatedData);
@@ -123,7 +179,6 @@ const updateProduct = catchAsync(async (req, res) => {
   });
 });
 
-// Product delete controller
 const deleteSingleProduct = catchAsync(async (req, res) => {
   const { id } = req.params;
 

@@ -70,7 +70,9 @@ const createProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     const files = req.files || {};
     const productData = Object.assign(Object.assign({}, req.body), { featuredImg: ((_b = (_a = files["featuredImgFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) || req.body.featuredImg || "", gallery: files["galleryImagesFiles"]
             ? files["galleryImagesFiles"].map((f) => f.path)
-            : req.body.gallery || [] });
+            : req.body.gallery || [], previewImg: files["previewImgFile"]
+            ? files["previewImgFile"].map((f) => f.path)
+            : req.body.previewImg || [] });
     const result = yield product_service_1.productServices.createProductOnDB(productData);
     (0, sendResponse_1.default)(res, {
         success: true,
@@ -80,7 +82,7 @@ const createProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     });
 }));
 const updateProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     const { id } = req.params;
     const files = req.files;
     const updatedData = Object.assign({}, req.body);
@@ -89,6 +91,9 @@ const updateProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     }
     if ((_c = files["galleryImagesFiles"]) === null || _c === void 0 ? void 0 : _c.length) {
         updatedData.gallery = files["galleryImagesFiles"].map((f) => f.path);
+    }
+    if ((_d = files["previewImgFile"]) === null || _d === void 0 ? void 0 : _d.length) {
+        updatedData.previewImg = files["previewImgFile"].map((f) => f.path);
     }
     const result = yield product_service_1.productServices.updateProductOnDB(id, updatedData);
     (0, sendResponse_1.default)(res, {
