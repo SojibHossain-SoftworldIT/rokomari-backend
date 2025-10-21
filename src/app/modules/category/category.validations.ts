@@ -1,17 +1,17 @@
 import { z } from "zod";
 
-export const iconSchema = z.object({
-  name: z.string({
-    error: (issue) =>
-      issue.input === undefined ? "Icon name is required!" : "Not a string!",
-  }),
-  url: z
-    .string({
-      error: (issue) =>
-        issue.input === undefined ? "Icon URL is required!" : "Not a string!",
-    })
-    .url("Invalid icon URL!"),
-});
+// export const iconSchema = z.object({
+//   name: z.string({
+//     error: (issue) =>
+//       issue.input === undefined ? "Icon name is required!" : "Not a string!",
+//   }),
+//   url: z
+//     .string({
+//       error: (issue) =>
+//         issue.input === undefined ? "Icon URL is required!" : "Not a string!",
+//     })
+//     .url("Invalid icon URL!"),
+// });
 
 export const createCategoryZodSchema = z.object({
   name: z.string({
@@ -27,7 +27,7 @@ export const createCategoryZodSchema = z.object({
         ? "Category description is required!"
         : "Not a string!",
   }),
-  icon: iconSchema,
+  // icon: iconSchema,
   image: z
     .string({
       error: (issue) =>

@@ -1,12 +1,12 @@
 type TIcon = {
-  name: string;
-  url: string;
+  name?: string;
+  url?: string;
 };
 
 export type TTag = {
   name: string;
   slug?: string;
   details: string;
-  icon: TIcon;
+  icon?: TIcon;
   image: string;
 };
