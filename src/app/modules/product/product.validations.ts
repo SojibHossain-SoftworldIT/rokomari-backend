@@ -29,6 +29,7 @@ const externalZodSchema = z.object({
 // productInfo validation
 const productInfoZodSchema = z.object({
   price: z.number({ error: "Price is required!" }),
+  brand: z.string().optional(),
   salePrice: z.number().optional(),
   quantity: z.number({ error: "Quantity is required!" }),
   sku: z.string({ error: "SKU is required!" }),
