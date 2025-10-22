@@ -31,6 +31,7 @@ export type TExternal = {
 
 export type TProductInfo = {
   price: number;
+  brand?: Types.ObjectId;
   salePrice?: number;
   quantity: number;
   sku: string;
