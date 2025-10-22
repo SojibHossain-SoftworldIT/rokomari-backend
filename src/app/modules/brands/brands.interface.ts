@@ -1,6 +1,6 @@
 type TBrandIcon = {
-  name: string;
-  url: string;
+  name?: string;
+  url?: string;
 };
 
 type TImages = {
@@ -10,6 +10,6 @@ type TImages = {
 
 export type TBrands = {
   name: string;
-  icon: TBrandIcon;
+  icon?: TBrandIcon;
   images: TImages[];
 };
