@@ -1,16 +1,21 @@
 import { z } from "zod";
 
+// export const iconSchema = z.object({
+//   name: z.string({
+//     error: (issue) =>
+//       issue.input === undefined ? "Icon name is required!" : "Not a string!",
+//   }),
+//   url: z
+//     .string({
+//       error: (issue) =>
+//         issue.input === undefined ? "Icon URL is required!" : "Not a string!",
+//     })
+//     .url("Invalid icon URL!"),
+// });
+
 export const iconSchema = z.object({
-  name: z.string({
-    error: (issue) =>
-      issue.input === undefined ? "Icon name is required!" : "Not a string!",
-  }),
-  url: z
-    .string({
-      error: (issue) =>
-        issue.input === undefined ? "Icon URL is required!" : "Not a string!",
-    })
-    .url("Invalid icon URL!"),
+  name: z.string().optional(),
+  url: z.string().optional(),
 });
 
 export const imageItemSchema = z.object({
