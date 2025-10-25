@@ -13,36 +13,131 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.brandsControllers = void 0;
+const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
-const http_status_1 = __importDefault(require("http-status"));
 const brands_service_1 = require("./brands.service");
+/**
+ * 🔹 Get all brands
+ */
 const getAllBrands = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield brands_service_1.brandServices.getAllBrandsFromDB();
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
-        message: "Brands retrieve successfully!",
+        message: "Brands retrieved successfully!",
         data: result,
     });
 }));
+/**
+ * 🔹 Get single brand
+ */
 const getSingleBrand = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
+    const { id } = req.params;
     const result = yield brands_service_1.brandServices.getSingleBrandFromDB(id);
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
-        message: "Brand data retrieve successfully!",
+        message: "Brand data retrieved successfully!",
         data: result,
     });
 }));
+/**
+ * 🔹 Create brand (accepts both files and JSON)
+ */
 const createBrand = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const brandData = req.body;
+    var _a, _b, _c;
+    const files = req.files || {};
+    const brandData = Object.assign(Object.assign({}, req.body), { icon: {
+            name: req.body.iconName || "",
+            url: ((_b = (_a = files["iconFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) || req.body.iconUrl || "",
+        }, images: [] });
+    // ✅ Handle images (array of layout + image)
+    if ((_c = files["imagesFiles"]) === null || _c === void 0 ? void 0 : _c.length) {
+        brandData.images = files["imagesFiles"].map((file, index) => ({
+            layout: req.body[`images[${index}].layout`] ||
+                req.body.layout ||
+                "grid",
+            image: file.path,
+        }));
+    }
+    else if (req.body.images) {
+        // ✅ Handle JSON input for images
+        try {
+            brandData.images = Array.isArray(req.body.images)
+                ? req.body.images
+                : JSON.parse(req.body.images);
+        }
+        catch (_d) {
+            brandData.images = [];
+        }
+    }
     const result = yield brands_service_1.brandServices.createBrandOnDB(brandData);
     (0, sendResponse_1.default)(res, {
         success: true,
-        statusCode: http_status_1.default.OK,
+        statusCode: http_status_1.default.CREATED,
         message: "Brand created successfully!",
+        data: result,
+    });
+}));
+/**
+ * 🔹 Update brand (accepts both files and JSON)
+ */
+const updateBrand = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c;
+    const { id } = req.params;
+    const files = req.files || {};
+    const updatedData = Object.assign({}, req.body);
+    // ✅ Update icon (prefer uploaded file)
+    if ((_b = (_a = files["iconFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) {
+        updatedData.icon = {
+            name: req.body.iconName || "",
+            url: files["iconFile"][0].path,
+        };
+    }
+    else if (req.body.iconUrl || req.body.iconName) {
+        updatedData.icon = {
+            name: req.body.iconName || "",
+            url: req.body.iconUrl || "",
+        };
+    }
+    // ✅ Update images (either uploaded files or JSON)
+    if ((_c = files["imagesFiles"]) === null || _c === void 0 ? void 0 : _c.length) {
+        updatedData.images = files["imagesFiles"].map((file, index) => ({
+            layout: req.body[`images[${index}].layout`] ||
+                req.body.layout ||
+                "grid",
+            image: file.path,
+        }));
+    }
+    else if (req.body.images) {
+        try {
+            updatedData.images = Array.isArray(req.body.images)
+                ? req.body.images
+                : JSON.parse(req.body.images);
+        }
+        catch (_d) {
+            updatedData.images = [];
+        }
+    }
+    const result = yield brands_service_1.brandServices.updateBrandOnDB(id, updatedData);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Brand updated successfully!",
+        data: result,
+    });
+}));
+/**
+ * 🔹 Delete brand
+ */
+const deleteBrand = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield brands_service_1.brandServices.deleteBrandFromDB(id);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Brand deleted successfully!",
         data: result,
     });
 }));
@@ -50,4 +145,6 @@ exports.brandsControllers = {
     getAllBrands,
     getSingleBrand,
     createBrand,
+    updateBrand,
+    deleteBrand,
 };

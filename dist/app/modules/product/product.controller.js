@@ -81,19 +81,72 @@ const createProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
         data: result,
     });
 }));
+// const updateProduct = catchAsync(async (req, res) => {
+//   const { id } = req.params;
+//   const files = req.files as {
+//     [fieldname: string]: Express.Multer.File[];
+//   };
+//   const updatedData: any = {
+//     ...req.body,
+//   };
+//   if (files["featuredImgFile"]?.[0]?.path) {
+//     updatedData.featuredImg = files["featuredImgFile"][0].path;
+//   }
+//   if (files["galleryImagesFiles"]?.length) {
+//     updatedData.gallery = files["galleryImagesFiles"].map((f) => f.path);
+//   }
+//   if (files["previewImgFile"]?.length) {
+//     updatedData.previewImg = files["previewImgFile"].map((f) => f.path);
+//   }
+//   const result = await productServices.updateProductOnDB(id, updatedData);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.OK,
+//     message: "Product updated successfully!",
+//     data: result,
+//   });
+// });
+// Product delete controller
 const updateProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d;
     const { id } = req.params;
-    const files = req.files;
+    const files = req.files || {};
     const updatedData = Object.assign({}, req.body);
+    // ✅ Safely handle featured image
     if ((_b = (_a = files["featuredImgFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) {
         updatedData.featuredImg = files["featuredImgFile"][0].path;
     }
+    else if (req.body.featuredImg) {
+        updatedData.featuredImg = req.body.featuredImg;
+    }
+    // ✅ Safely handle gallery
     if ((_c = files["galleryImagesFiles"]) === null || _c === void 0 ? void 0 : _c.length) {
         updatedData.gallery = files["galleryImagesFiles"].map((f) => f.path);
     }
+    else if (req.body.gallery) {
+        // Handle JSON array (stringified or real array)
+        try {
+            updatedData.gallery = Array.isArray(req.body.gallery)
+                ? req.body.gallery
+                : JSON.parse(req.body.gallery);
+        }
+        catch (_e) {
+            updatedData.gallery = [req.body.gallery];
+        }
+    }
+    // ✅ Safely handle preview images
     if ((_d = files["previewImgFile"]) === null || _d === void 0 ? void 0 : _d.length) {
         updatedData.previewImg = files["previewImgFile"].map((f) => f.path);
+    }
+    else if (req.body.previewImg) {
+        try {
+            updatedData.previewImg = Array.isArray(req.body.previewImg)
+                ? req.body.previewImg
+                : JSON.parse(req.body.previewImg);
+        }
+        catch (_f) {
+            updatedData.previewImg = [req.body.previewImg];
+        }
     }
     const result = yield product_service_1.productServices.updateProductOnDB(id, updatedData);
     (0, sendResponse_1.default)(res, {
@@ -103,7 +156,6 @@ const updateProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
         data: result,
     });
 }));
-// Product delete controller
 const deleteSingleProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const result = yield product_service_1.productServices.deleteSingleProductOnDB(id);
