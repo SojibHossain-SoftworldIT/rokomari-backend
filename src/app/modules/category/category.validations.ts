@@ -28,19 +28,21 @@ export const createCategoryZodSchema = z.object({
         : "Not a string!",
   }),
   // icon: iconSchema,
-  image: z
-    .string({
-      error: (issue) =>
-        issue.input === undefined ? "Image is required!" : "Not a string!",
-    })
-    .url("Invalid image URL!"),
-  bannerImg: z
-    .string({
-      error: (issue) =>
-        issue.input === undefined
-          ? "Banner image is required!"
-          : "Not a string!",
-    })
-    .url("Invalid banner image URL!"),
+  // image: z
+  //   .string({
+  //     error: (issue) =>
+  //       issue.input === undefined ? "Image is required!" : "Not a string!",
+  //   })
+  //   .url("Invalid image URL!"),
+  image: z.string().optional(),
+  // bannerImg: z
+  //   .string({
+  //     error: (issue) =>
+  //       issue.input === undefined
+  //         ? "Banner image is required!"
+  //         : "Not a string!",
+  //   })
+  //   .url("Invalid banner image URL!"),
+  bannerImg: z.string().optional(),
   subCategories: z.array(z.string()).default([]),
 });
