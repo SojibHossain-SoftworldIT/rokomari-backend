@@ -13,6 +13,7 @@ import { OrderStatusRoutes } from "../modules/orderStatus/orderStatus.route";
 import { ProductRoutes } from "../modules/product/product.routes";
 import { reviewRoutes } from "../modules/review/review.routes";
 import { SalesHistoryRoutes } from "../modules/salesHistory/salesHistory.routes";
+import { settingsRoutes } from "../modules/settings/settings.routes";
 import { ShippingRoutes } from "../modules/shipping/shipping.route";
 import { ShopRoutes } from "../modules/shop/shop.route";
 import { SummaryRoutes } from "../modules/summary/summary.route";
@@ -132,6 +133,10 @@ const moduleRoutes = [
   {
     path: "/reviews",
     route: reviewRoutes,
+  },
+  {
+    path: "/settings",
+    route: settingsRoutes,
   },
 ];
 

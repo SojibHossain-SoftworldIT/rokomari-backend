@@ -18,6 +18,7 @@ const orderStatus_route_1 = require("../modules/orderStatus/orderStatus.route");
 const product_routes_1 = require("../modules/product/product.routes");
 const review_routes_1 = require("../modules/review/review.routes");
 const salesHistory_routes_1 = require("../modules/salesHistory/salesHistory.routes");
+const settings_routes_1 = require("../modules/settings/settings.routes");
 const shipping_route_1 = require("../modules/shipping/shipping.route");
 const shop_route_1 = require("../modules/shop/shop.route");
 const summary_route_1 = require("../modules/summary/summary.route");
@@ -135,6 +136,10 @@ const moduleRoutes = [
     {
         path: "/reviews",
         route: review_routes_1.reviewRoutes,
+    },
+    {
+        path: "/settings",
+        route: settings_routes_1.settingsRoutes,
     },
 ];
 moduleRoutes.forEach((route) => router.use(route === null || route === void 0 ? void 0 : route.path, route === null || route === void 0 ? void 0 : route.route));

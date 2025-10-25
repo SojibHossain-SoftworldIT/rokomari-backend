@@ -82,18 +82,49 @@ const createTag = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
         data: result,
     });
 }));
+// const updateTag = catchAsync(async (req, res) => {
+//   const { id } = req.params;
+//   const files =
+//     (req.files as { [fieldname: string]: Express.Multer.File[] }) || {};
+//   const updatedData: any = { ...req.body };
+//   if (files["imageFile"]?.[0]?.path) {
+//     updatedData.image = files["imageFile"][0].path;
+//   }
+//   if (files["iconFile"]?.[0]?.path) {
+//     updatedData.icon = {
+//       name: req.body.iconName || "",
+//       url: files["iconFile"][0].path,
+//     };
+//   }
+//   const result = await tagServices.updateTagInDB(id, updatedData);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.OK,
+//     message: "Tag updated successfully!",
+//     data: result,
+//   });
+// });
 const updateTag = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     const { id } = req.params;
     const files = req.files || {};
     const updatedData = Object.assign({}, req.body);
     if ((_b = (_a = files["imageFile"]) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.path) {
         updatedData.image = files["imageFile"][0].path;
     }
-    if ((_d = (_c = files["iconFile"]) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.path) {
+    else if (req.body.imageFile) {
+        updatedData.image = (_c = req.body) === null || _c === void 0 ? void 0 : _c.imageFile;
+    }
+    if ((_e = (_d = files["iconFile"]) === null || _d === void 0 ? void 0 : _d[0]) === null || _e === void 0 ? void 0 : _e.path) {
         updatedData.icon = {
             name: req.body.iconName || "",
             url: files["iconFile"][0].path,
+        };
+    }
+    else if (req.body.iconFile || req.body.iconName) {
+        updatedData.icon = {
+            name: req.body.iconName || "",
+            url: req.body.iconFile || "",
         };
     }
     const result = yield tags_services_1.tagServices.updateTagInDB(id, updatedData);
