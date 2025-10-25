@@ -86,6 +86,34 @@ const createTag = catchAsync(async (req, res) => {
   });
 });
 
+// const updateTag = catchAsync(async (req, res) => {
+//   const { id } = req.params;
+//   const files =
+//     (req.files as { [fieldname: string]: Express.Multer.File[] }) || {};
+
+//   const updatedData: any = { ...req.body };
+
+//   if (files["imageFile"]?.[0]?.path) {
+//     updatedData.image = files["imageFile"][0].path;
+//   }
+
+//   if (files["iconFile"]?.[0]?.path) {
+//     updatedData.icon = {
+//       name: req.body.iconName || "",
+//       url: files["iconFile"][0].path,
+//     };
+//   }
+
+//   const result = await tagServices.updateTagInDB(id, updatedData);
+
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.OK,
+//     message: "Tag updated successfully!",
+//     data: result,
+//   });
+// });
+
 const updateTag = catchAsync(async (req, res) => {
   const { id } = req.params;
   const files =
@@ -95,12 +123,19 @@ const updateTag = catchAsync(async (req, res) => {
 
   if (files["imageFile"]?.[0]?.path) {
     updatedData.image = files["imageFile"][0].path;
+  } else if (req.body.imageFile) {
+    updatedData.image = req.body?.imageFile;
   }
 
   if (files["iconFile"]?.[0]?.path) {
     updatedData.icon = {
       name: req.body.iconName || "",
       url: files["iconFile"][0].path,
+    };
+  } else if (req.body.iconFile || req.body.iconName) {
+    updatedData.icon = {
+      name: req.body.iconName || "",
+      url: req.body.iconFile || "",
     };
   }
 

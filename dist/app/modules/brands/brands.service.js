@@ -13,9 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.brandServices = void 0;
+const http_status_1 = __importDefault(require("http-status"));
 const handleAppError_1 = __importDefault(require("../../errors/handleAppError"));
 const brands_model_1 = require("./brands.model");
-const http_status_1 = __importDefault(require("http-status"));
 const getAllBrandsFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield brands_model_1.BrandModel.find();
     return result;
@@ -32,8 +32,26 @@ const createBrandOnDB = (payload) => __awaiter(void 0, void 0, void 0, function*
     const result = yield brands_model_1.BrandModel.create(payload);
     return result;
 });
+const updateBrandOnDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const isBrandExists = yield brands_model_1.BrandModel.findById(id);
+    if (!isBrandExists) {
+        throw new handleAppError_1.default(http_status_1.default.NOT_FOUND, "Brand Not Found!");
+    }
+    const result = yield brands_model_1.BrandModel.findByIdAndUpdate(id, payload, { new: true });
+    return result;
+});
+const deleteBrandFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const isBrandExists = yield brands_model_1.BrandModel.findById(id);
+    if (!isBrandExists) {
+        throw new handleAppError_1.default(http_status_1.default.NOT_FOUND, "Brand Not Found!");
+    }
+    const result = yield brands_model_1.BrandModel.findByIdAndDelete(id);
+    return result;
+});
 exports.brandServices = {
     getAllBrandsFromDB,
     getSingleBrandFromDB,
     createBrandOnDB,
+    updateBrandOnDB,
+    deleteBrandFromDB,
 };

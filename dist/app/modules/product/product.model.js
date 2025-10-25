@@ -47,6 +47,7 @@ const externalSchema = new mongoose_1.Schema({
 // Product Info Schema
 const productInfoSchema = new mongoose_1.Schema({
     price: { type: Number, required: true },
+    brand: { type: mongoose_1.Schema.Types.ObjectId, ref: "brand" },
     salePrice: Number,
     quantity: { type: Number, required: true },
     sku: { type: String, required: true, unique: true },
