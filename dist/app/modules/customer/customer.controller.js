@@ -48,7 +48,6 @@ const createCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
 }));
 const updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const customerId = req.params.id;
-    console.log(customerId);
     const result = yield customer_service_1.customerServices.updateCustomerOnDB(customerId, req.body);
     (0, sendResponse_1.default)(res, {
         success: true,
