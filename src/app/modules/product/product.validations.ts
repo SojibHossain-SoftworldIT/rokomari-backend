@@ -56,7 +56,7 @@ const productInfoZodSchema = z.object({
 // author validation
 const authorZodSchema = z.object({
   name: z.string({ error: "Author name is required!" }),
-  image: z.string().url().optional(),
+  image: z.string().optional(),
   description: z.string().optional(),
 });
 

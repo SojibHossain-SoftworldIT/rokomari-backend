@@ -82,6 +82,17 @@ const createProduct = catchAsync(async (req, res) => {
       : req.body.previewImg || [],
   };
 
+  // ✅ Handle author images dynamically
+  if (req.body.bookInfo?.specification?.authors) {
+    productData.bookInfo.specification.authors =
+      req.body.bookInfo?.specification?.authors.map(
+        (author: any, index: number) => ({
+          ...author,
+          image: files[`authorImage_${index}`]?.[0]?.path || author.image || "",
+        })
+      );
+  }
+
   const result = await productServices.createProductOnDB(productData);
 
   sendResponse(res, {
@@ -168,6 +179,17 @@ const updateProduct = catchAsync(async (req, res) => {
     } catch {
       updatedData.previewImg = [req.body.previewImg];
     }
+  }
+
+  // ✅ Handle author images update
+  if (updatedData.bookInfo?.specification?.authors) {
+    updatedData.bookInfo.specification.authors =
+      updatedData.bookInfo.specification.authors.map(
+        (author: any, index: number) => ({
+          ...author,
+          image: files[`authorImage_${index}`]?.[0]?.path || author.image || "",
+        })
+      );
   }
 
   const result = await productServices.updateProductOnDB(id, updatedData);

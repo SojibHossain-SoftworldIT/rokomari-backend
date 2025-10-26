@@ -134,6 +134,41 @@ const updateProductOnDB = async (
     ) as "hardcover" | "paperback";
   }
 
+  // 🧩 Handle author image cleanup
+  const oldAuthors = isProductExist.bookInfo?.specification?.authors || [];
+  const newAuthors = updatedData.bookInfo?.specification?.authors || [];
+
+  const deletedImages = oldAuthors
+    .filter((old) => !newAuthors.some((n) => n.image === old.image))
+    .map((a) => a.image)
+    .filter(Boolean);
+
+  // 🧩 Handle gallery cleanup
+  if ((updatedData as any).deletedImages?.length > 0) {
+    await Promise.all(
+      (updatedData as any).deletedImages.map((img: string) =>
+        deleteImageFromCLoudinary(img)
+      )
+    );
+  }
+  // 🧩 Handle gallery cleanup
+  if ((updatedData as any).deletedImages?.length > 0) {
+    await Promise.all(
+      (updatedData as any).deletedImages.map((img: string) =>
+        deleteImageFromCLoudinary(img)
+      )
+    );
+  }
+
+  // 🧩 Handle gallery cleanup
+  if ((updatedData as any).deletedImages?.length > 0) {
+    await Promise.all(
+      (updatedData as any).deletedImages.map((img: string) =>
+        deleteImageFromCLoudinary(img)
+      )
+    );
+  }
+
   // handle gallery update with deletedImages
   if (
     (updatedData as any).deletedImages &&
