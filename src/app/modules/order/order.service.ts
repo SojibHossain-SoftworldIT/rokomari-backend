@@ -14,9 +14,16 @@ const getAllOrdersFromDB = async (query: Record<string, unknown>) => {
     .paginate()
     .fields();
 
-  const result = await orderQuery.modelQuery;
+  // ✅ Execute main query for product data
+  const data = await orderQuery.modelQuery;
 
-  return result;
+  // ✅ Use built-in countTotal() from QueryBuilder
+  const meta = await orderQuery.countTotal();
+
+  return {
+    meta,
+    data,
+  };
 };
 
 //get my orders

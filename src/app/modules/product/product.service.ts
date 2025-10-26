@@ -42,8 +42,16 @@ const getAllProductFromDB = async (query: Record<string, unknown>) => {
     .sort()
     .paginate()
     .fields();
+  // ✅ Execute main query for product data
+  const data = await productQuery.modelQuery;
 
-  return await productQuery.modelQuery;
+  // ✅ Use built-in countTotal() from QueryBuilder
+  const meta = await productQuery.countTotal();
+
+  return {
+    meta,
+    data,
+  };
 };
 
 const getProductsByCategoryandTag = async (category: string, tag: string) => {
