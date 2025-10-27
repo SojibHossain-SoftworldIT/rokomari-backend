@@ -181,16 +181,16 @@ const updateProduct = catchAsync(async (req, res) => {
     }
   }
 
-  // ✅ Handle author images update
-  if (updatedData.bookInfo?.specification?.authors) {
-    updatedData.bookInfo.specification.authors =
-      updatedData.bookInfo.specification.authors.map(
-        (author: any, index: number) => ({
-          ...author,
-          image: files[`authorImage_${index}`]?.[0]?.path || author.image || "",
-        })
-      );
-  }
+  // // ✅ Handle author images update
+  // if (updatedData.bookInfo?.specification?.authors) {
+  //   updatedData.bookInfo.specification.authors =
+  //     updatedData.bookInfo.specification.authors.map(
+  //       (author: any, index: number) => ({
+  //         ...author,
+  //         image: files[`authorImage_${index}`]?.[0]?.path || author.image || "",
+  //       })
+  //     );
+  // }
 
   const result = await productServices.updateProductOnDB(id, updatedData);
 
