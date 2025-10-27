@@ -37,6 +37,8 @@ export type TSettings = {
     description: string;
   };
 
+  deliveryCharge?: number;
+
   mobileMfs?: {
     bKash?: TbKash;
     nagad?: TNagad;

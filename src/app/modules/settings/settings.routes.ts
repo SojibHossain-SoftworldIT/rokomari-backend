@@ -16,7 +16,23 @@ const uploadFields = multerUpload.fields([
 ]);
 
 router.get("/", settingsControllers.getSettings);
+router.get("/logo", settingsControllers.getLogo);
+router.get("/slider-images", settingsControllers.getSliderImages);
+router.get("/contact-and-social", settingsControllers.getContactAndSocial);
+router.get("/mobile-mfs", settingsControllers.getMobileMfs);
+router.get("/delivery-charge", settingsControllers.getDeliveryCharge);
 router.post("/", uploadFields, settingsControllers.createSettings);
 router.patch("/", uploadFields, settingsControllers.updateSettings);
+// PATCH: update only MFS logos and numbers
+router.patch(
+  "/mfs-update",
+  multerUpload.fields([
+    { name: "bKashLogo", maxCount: 1 },
+    { name: "nagadLogo", maxCount: 1 },
+    { name: "rocketLogo", maxCount: 1 },
+    { name: "upayLogo", maxCount: 1 },
+  ]),
+  settingsControllers.updateMfsSettings
+);
 
 export const settingsRoutes = router;

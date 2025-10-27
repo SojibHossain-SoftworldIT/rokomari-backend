@@ -46,6 +46,7 @@ export const createSettingsValidationSchema = z.object({
           .optional(),
       })
       .optional(),
+    deliveryCharge: z.number().optional(),
     contactAndSocial: z
       .object({
         address: z.string().optional(),

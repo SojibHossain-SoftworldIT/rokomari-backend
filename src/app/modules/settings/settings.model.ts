@@ -66,6 +66,8 @@ const settingsSchema = new Schema<TSettings>(
       upay: upaySchema,
     },
 
+    deliveryCharge: { type: Number, default: 0 },
+
     contactAndSocial: {
       address: { type: String },
       email: { type: String },
