@@ -7,7 +7,6 @@ const calculateDiscount = (price: number, salePrice?: number) => {
 };
 
 import {
-  TAuthor,
   TBookInfo,
   TCategoriesAndTags,
   TDescription,
@@ -99,19 +98,19 @@ const productInfoSchema = new Schema<TProductInfo>(
 );
 
 // Author Schema
-const authorSchema = new Schema<TAuthor>(
-  {
-    name: { type: String, required: true },
-    image: String,
-    description: String,
-  },
-  { _id: false }
-);
+// const authorSchema = new Schema<TAuthor>(
+//   {
+//     name: { type: String, required: true },
+//     image: String,
+//     description: String,
+//   },
+//   { _id: false }
+// );
 
 // Specification Schema
 const specificationSchema = new Schema<TSpecification>(
   {
-    authors: { type: [authorSchema], required: true },
+    authors: { type: [Schema.Types.ObjectId], ref: "Author", required: true },
     publisher: {
       type: String,
       required: true,

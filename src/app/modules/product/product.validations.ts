@@ -54,15 +54,15 @@ const productInfoZodSchema = z.object({
 });
 
 // author validation
-const authorZodSchema = z.object({
-  name: z.string({ error: "Author name is required!" }),
-  image: z.string().optional(),
-  description: z.string().optional(),
-});
+// const authorZodSchema = z.object({
+//   name: z.string({ error: "Author name is required!" }),
+//   image: z.string().optional(),
+//   description: z.string().optional(),
+// });
 
 // specification validation
 const specificationZodSchema = z.object({
-  authors: z.array(authorZodSchema).min(1, "At least one author is required!"),
+  authors: z.array(z.string()).min(1, "At least one author is required!"),
   publisher: z.string({ error: "Publisher is required!" }),
   edition: z.string().optional(),
   editionYear: z.number().optional(),

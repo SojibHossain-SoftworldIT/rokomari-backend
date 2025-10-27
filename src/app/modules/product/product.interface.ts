@@ -54,14 +54,14 @@ export type TProductInfo = {
   inStock?: boolean; // derived field
 };
 
-export type TAuthor = {
-  name: string;
-  image?: string;
-  description?: string;
-};
+// export type TAuthor = {
+//   name: string;
+//   image?: string;
+//   description?: string;
+// };
 
 export type TSpecification = {
-  authors: TAuthor[];
+  authors: Types.ObjectId[]; // Array of author IDs
   publisher: string; // Publisher name
   edition?: string;
   editionYear?: number;
