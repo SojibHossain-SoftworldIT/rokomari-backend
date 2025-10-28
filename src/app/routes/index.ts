@@ -1,6 +1,7 @@
 import express from "express";
 import { AttributeRoutes } from "../modules/attributes/attributes.route";
 import { AuthRoutes } from "../modules/auth/auth.routes";
+import { AuthorRoutes } from "../modules/authors/authors.routes";
 import { BecomeSellerReviewRoutes } from "../modules/becomeSellerReview/becomeSellerReview.routes";
 import { BrandRoutes } from "../modules/brands/brands.routes";
 import { CategoryRoutes } from "../modules/category/category.routes";
@@ -33,6 +34,10 @@ const moduleRoutes = [
   {
     path: "/auth",
     route: AuthRoutes,
+  },
+  {
+    path: "/author",
+    route: AuthorRoutes,
   },
   {
     path: "/user",

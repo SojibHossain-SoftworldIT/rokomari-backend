@@ -14,6 +14,12 @@ import { z } from "zod";
 // });
 
 export const createCategoryZodSchema = z.object({
+  mainCategory: z.string({
+    error: (issue) =>
+      issue.input === undefined
+        ? "Main category is required!"
+        : "Not a string!",
+  }),
   name: z.string({
     error: (issue) =>
       issue.input === undefined

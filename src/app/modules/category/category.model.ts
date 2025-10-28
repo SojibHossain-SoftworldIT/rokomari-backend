@@ -11,6 +11,10 @@ const iconSchema = new Schema(
 
 const categorySchema = new Schema<TCategory>(
   {
+    mainCategory: {
+      type: String,
+      required: [true, "Category must have a main category!"],
+    },
     name: {
       type: String,
       required: [true, "Category can't create without a name!"],

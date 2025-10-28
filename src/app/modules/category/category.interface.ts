@@ -4,6 +4,7 @@ type TIcon = {
 };
 
 export type TCategory = {
+  mainCategory: string;
   name: string;
   slug?: string;
   details: string;

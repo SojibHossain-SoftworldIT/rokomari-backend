@@ -67,6 +67,7 @@ const externalSchema = new Schema<TExternal>(
 // Product Info Schema
 const productInfoSchema = new Schema<TProductInfo>(
   {
+    productTitle: { type: String, required: true },
     price: { type: Number, required: true },
     brand: { type: Schema.Types.ObjectId, ref: "brand" },
     salePrice: Number,
