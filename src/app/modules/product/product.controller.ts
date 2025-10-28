@@ -83,15 +83,15 @@ const createProduct = catchAsync(async (req, res) => {
   };
 
   // ✅ Handle author images dynamically
-  if (req.body.bookInfo?.specification?.authors) {
-    productData.bookInfo.specification.authors =
-      req.body.bookInfo?.specification?.authors.map(
-        (author: any, index: number) => ({
-          ...author,
-          image: files[`authorImage_${index}`]?.[0]?.path || author.image || "",
-        })
-      );
-  }
+  // if (req.body.bookInfo?.specification?.authors) {
+  //   productData.bookInfo.specification.authors =
+  //     req.body.bookInfo?.specification?.authors.map(
+  //       (author: any, index: number) => ({
+  //         ...author,
+  //         image: files[`authorImage_${index}`]?.[0]?.path || author.image || "",
+  //       })
+  //     );
+  // }
 
   const result = await productServices.createProductOnDB(productData);
 
@@ -137,6 +137,71 @@ const createProduct = catchAsync(async (req, res) => {
 
 // Product delete controller
 
+// const updateProduct = catchAsync(async (req, res) => {
+//   const { id } = req.params;
+
+//   const files =
+//     (req.files as { [fieldname: string]: Express.Multer.File[] }) || {};
+
+//   const updatedData: any = {
+//     ...req.body,
+//   };
+
+//   // ✅ Safely handle featured image
+//   if (files["featuredImgFile"]?.[0]?.path) {
+//     updatedData.featuredImg = files["featuredImgFile"][0].path;
+//   } else if (req.body.featuredImg) {
+//     updatedData.featuredImg = req.body.featuredImg;
+//   }
+
+//   // ✅ Safely handle gallery
+//   if (files["galleryImagesFiles"]?.length) {
+//     updatedData.gallery = files["galleryImagesFiles"].map((f) => f.path);
+//   } else if (req.body.gallery) {
+//     // Handle JSON array (stringified or real array)
+//     try {
+//       updatedData.gallery = Array.isArray(req.body.gallery)
+//         ? req.body.gallery
+//         : JSON.parse(req.body.gallery);
+//     } catch {
+//       updatedData.gallery = [req.body.gallery];
+//     }
+//   }
+
+//   // ✅ Safely handle preview images
+//   if (files["previewImgFile"]?.length) {
+//     updatedData.previewImg = files["previewImgFile"].map((f) => f.path);
+//   } else if (req.body.previewImg) {
+//     try {
+//       updatedData.previewImg = Array.isArray(req.body.previewImg)
+//         ? req.body.previewImg
+//         : JSON.parse(req.body.previewImg);
+//     } catch {
+//       updatedData.previewImg = [req.body.previewImg];
+//     }
+//   }
+
+//   // // ✅ Handle author images update
+//   // if (updatedData.bookInfo?.specification?.authors) {
+//   //   updatedData.bookInfo.specification.authors =
+//   //     updatedData.bookInfo.specification.authors.map(
+//   //       (author: any, index: number) => ({
+//   //         ...author,
+//   //         image: files[`authorImage_${index}`]?.[0]?.path || author.image || "",
+//   //       })
+//   //     );
+//   // }
+
+//   const result = await productServices.updateProductOnDB(id, updatedData);
+
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.OK,
+//     message: "Product updated successfully!",
+//     data: result,
+//   });
+// });
+
 const updateProduct = catchAsync(async (req, res) => {
   const { id } = req.params;
 
@@ -154,43 +219,39 @@ const updateProduct = catchAsync(async (req, res) => {
     updatedData.featuredImg = req.body.featuredImg;
   }
 
-  // ✅ Safely handle gallery
+  // Handle gallery images
   if (files["galleryImagesFiles"]?.length) {
-    updatedData.gallery = files["galleryImagesFiles"].map((f) => f.path);
-  } else if (req.body.gallery) {
-    // Handle JSON array (stringified or real array)
+    const newGalleryImages = files["galleryImagesFiles"].map((f) => f.path);
+    // Merge with existing gallery images (if provided)
+    updatedData.gallery = Array.isArray(updatedData.gallery)
+      ? [...updatedData.gallery, ...newGalleryImages]
+      : newGalleryImages;
+  } else if (updatedData.gallery) {
     try {
-      updatedData.gallery = Array.isArray(req.body.gallery)
-        ? req.body.gallery
-        : JSON.parse(req.body.gallery);
+      updatedData.gallery = Array.isArray(updatedData.gallery)
+        ? updatedData.gallery
+        : JSON.parse(updatedData.gallery);
     } catch {
-      updatedData.gallery = [req.body.gallery];
+      updatedData.gallery = [updatedData.gallery];
     }
   }
 
-  // ✅ Safely handle preview images
+  // Handle preview images
   if (files["previewImgFile"]?.length) {
-    updatedData.previewImg = files["previewImgFile"].map((f) => f.path);
-  } else if (req.body.previewImg) {
+    const newPreviewImages = files["previewImgFile"].map((f) => f.path);
+    // Merge with existing preview images (if provided)
+    updatedData.previewImg = Array.isArray(updatedData.previewImg)
+      ? [...updatedData.previewImg, ...newPreviewImages]
+      : newPreviewImages;
+  } else if (updatedData.previewImg) {
     try {
-      updatedData.previewImg = Array.isArray(req.body.previewImg)
-        ? req.body.previewImg
-        : JSON.parse(req.body.previewImg);
+      updatedData.previewImg = Array.isArray(updatedData.previewImg)
+        ? updatedData.previewImg
+        : JSON.parse(updatedData.previewImg);
     } catch {
-      updatedData.previewImg = [req.body.previewImg];
+      updatedData.previewImg = [updatedData.previewImg];
     }
   }
-
-  // // ✅ Handle author images update
-  // if (updatedData.bookInfo?.specification?.authors) {
-  //   updatedData.bookInfo.specification.authors =
-  //     updatedData.bookInfo.specification.authors.map(
-  //       (author: any, index: number) => ({
-  //         ...author,
-  //         image: files[`authorImage_${index}`]?.[0]?.path || author.image || "",
-  //       })
-  //     );
-  // }
 
   const result = await productServices.updateProductOnDB(id, updatedData);
 

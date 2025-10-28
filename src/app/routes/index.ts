@@ -27,6 +27,7 @@ import { TransferRoutes } from "../modules/transfer/transfer.route";
 import { UserRoutes } from "../modules/user/user.routes";
 import { VendorRoutes } from "../modules/vendor/vendor.route";
 import { WithdrawalRoutes } from "./../modules/withdrawals/withdrawals.routes";
+import { ParentCategoryRoutes } from "./../modules/parentCategory/parentCategory.routes";
 
 const router = express.Router();
 
@@ -142,6 +143,10 @@ const moduleRoutes = [
   {
     path: "/settings",
     route: settingsRoutes,
+  },
+  {
+    path: "/parent-category",
+    route: ParentCategoryRoutes,
   },
 ];
 
