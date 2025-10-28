@@ -25,4 +25,4 @@ router.delete("/:id", authorsControllers.deleteAuthor);
 // ✅ New endpoint for following an author
 router.patch("/:id/follow", authorsControllers.followAuthor);
 
-export const authorRoutes = router;
+export const AuthorRoutes = router;

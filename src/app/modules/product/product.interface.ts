@@ -30,6 +30,7 @@ export type TExternal = {
 };
 
 export type TProductInfo = {
+  productTitle: string;
   price: number;
   brand?: Types.ObjectId;
   salePrice?: number;
@@ -61,7 +62,7 @@ export type TProductInfo = {
 // };
 
 export type TSpecification = {
-  authors: Types.ObjectId[]; // Array of author IDs
+  authors?: Types.ObjectId[]; // Array of author IDs
   publisher: string; // Publisher name
   edition?: string;
   editionYear?: number;
