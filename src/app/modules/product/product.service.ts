@@ -29,12 +29,51 @@ const createProductOnDB = async (payload: TProduct) => {
   return result;
 };
 
+// const getAllProductFromDB = async (query: Record<string, unknown>) => {
+//   const productQuery = new QueryBuilder(
+//     ProductModel.find()
+//       .populate("categoryAndTags.publisher")
+//       .populate("categoryAndTags.categories")
+//       .populate("categoryAndTags.tags"),
+//     // .populate("categoryAndTags.tags"),
+//     query
+//   )
+//     .search(ProductSearchableFields)
+//     .filter()
+//     .sort()
+//     .paginate()
+//     .fields();
+//   // ✅ Execute main query for product data
+//   const data = await productQuery.modelQuery;
+
+//   // ✅ Use built-in countTotal() from QueryBuilder
+//   const meta = await productQuery.countTotal();
+
+//   return {
+//     meta,
+//     data,
+//   };
+// };
+
 const getAllProductFromDB = async (query: Record<string, unknown>) => {
   const productQuery = new QueryBuilder(
     ProductModel.find()
-      .populate("categoryAndTags.publisher")
-      .populate("categoryAndTags.categories")
-      .populate("categoryAndTags.tags"),
+      .populate({
+        path: "categoryAndTags.categories",
+        model: "ParentCategory",
+        populate: {
+          path: "categories",
+          model: "category", // তোমার SubCategory মডেলের নাম
+        },
+      })
+      .populate({
+        path: "categoryAndTags.tags",
+        model: "tag",
+      })
+      .populate({
+        path: "bookInfo.specification.authors",
+        model: "Author",
+      }),
     query
   )
     .search(ProductSearchableFields)
@@ -42,16 +81,11 @@ const getAllProductFromDB = async (query: Record<string, unknown>) => {
     .sort()
     .paginate()
     .fields();
-  // ✅ Execute main query for product data
-  const data = await productQuery.modelQuery;
 
-  // ✅ Use built-in countTotal() from QueryBuilder
+  const data = await productQuery.modelQuery;
   const meta = await productQuery.countTotal();
 
-  return {
-    meta,
-    data,
-  };
+  return { meta, data };
 };
 
 const getProductsByCategoryandTag = async (category: string, tag: string) => {
@@ -111,11 +145,26 @@ const getProductsByCategoryandTag = async (category: string, tag: string) => {
   ]);
 };
 
+// const getSingleProductFromDB = async (id: string) => {
+//   return ProductModel.findById(id)
+//     .populate("categoryAndTags.publisher")
+//     .populate("categoryAndTags.categories")
+//     .populate("categoryAndTags.tags");
+// };
+
 const getSingleProductFromDB = async (id: string) => {
   return ProductModel.findById(id)
+    .populate({
+      path: "categoryAndTags.categories",
+      model: "ParentCategory",
+      populate: {
+        path: "categories",
+        model: "category",
+      },
+    })
+    .populate("categoryAndTags.tags")
     .populate("categoryAndTags.publisher")
-    .populate("categoryAndTags.categories")
-    .populate("categoryAndTags.tags");
+    .populate("bookInfo.specification.authors");
 };
 
 const updateProductOnDB = async (

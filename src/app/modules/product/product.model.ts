@@ -33,7 +33,7 @@ const categoryAndTagsSchema = new Schema<TCategoriesAndTags>(
       type: String,
     },
     categories: [
-      { type: Schema.Types.ObjectId, ref: "category", required: true },
+      { type: Schema.Types.ObjectId, ref: "ParentCategory", required: true },
     ],
     tags: [{ type: Schema.Types.ObjectId, ref: "tag", required: true }],
   },
