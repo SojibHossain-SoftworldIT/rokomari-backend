@@ -53,7 +53,7 @@ export type TOrderInfo = {
 
 export type TOrder = {
   orderInfo: TOrderInfo[];
-  customerInfo: TCustomerInfo;
+  customerInfo?: TCustomerInfo;
   paymentInfo: TPaymentInfo | "cash-on";
   totalAmount: number;
 };

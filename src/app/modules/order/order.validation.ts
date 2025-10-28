@@ -53,7 +53,7 @@ const customerInfoZodSchema = z.object({
         ? "Last name is required!"
         : "Must be a string!",
   }),
-  email: z.string().email("Must be a valid email!"),
+  email: z.string().email("Must be a valid email!").optional(),
   phone: z.string({
     error: (issue) =>
       issue.input === undefined
@@ -121,15 +121,10 @@ const paymentInfoZodSchema = z.union([
 ]);
 
 // Order Info Validation
+// Order Info Validation
 const orderInfoZodSchema = z.object({
-  orderBy: objectIdSchema.or(
-    z.string({
-      error: (issue) =>
-        issue.input === undefined
-          ? "OrderBy is required!"
-          : "Must be a valid ObjectId string!",
-    })
-  ),
+  orderBy: z.union([objectIdSchema, z.string()]).optional(), // ✅ fixed here
+
   productInfo: objectIdSchema.or(
     z.string({
       error: (issue) =>
@@ -138,7 +133,9 @@ const orderInfoZodSchema = z.object({
           : "Must be a valid ObjectId string!",
     })
   ),
+
   trackingNumber: z.string().optional(),
+
   status: z
     .enum(
       [
@@ -156,7 +153,9 @@ const orderInfoZodSchema = z.object({
     )
     .optional()
     .default("pending"),
+
   isCancelled: z.boolean().optional().default(false),
+
   quantity: z
     .number({
       error: (issue) =>
@@ -165,8 +164,10 @@ const orderInfoZodSchema = z.object({
           : "Must be a number!",
     })
     .min(1, "Quantity must be at least 1"),
+
   totalAmount: totalAmountZodSchema,
 });
+
 
 // Main Order Validation
 export const createOrderZodSchema = z.object({
