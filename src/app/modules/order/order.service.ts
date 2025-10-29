@@ -46,6 +46,56 @@ const getMyOrdersFromDB = async (
   return result;
 };
 
+/**
+ * ✅ Get Order by Tracking Number (Public - no authentication required)
+ */
+const getOrderByTrackingNumberFromDB = async (trackingNumber: string) => {
+  // Find the order by nested field `orderInfo.trackingNumber`
+  const result = await OrderModel.findOne({
+    "orderInfo.trackingNumber": trackingNumber,
+  })
+    .populate({
+      path: "orderInfo.productInfo",
+      select:
+        "description.name productInfo.price productInfo.salePrice featuredImg",
+    })
+    .lean(); // ✅ use .lean() for plain JS object (no Mongoose document overhead)
+
+  if (!result) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Order not found with this tracking number!"
+    );
+  }
+
+  // ✅ Find the specific orderInfo that matches this tracking number
+  const matchedOrderInfo = result.orderInfo.find(
+    (info) => info.trackingNumber === trackingNumber
+  );
+
+  if (!matchedOrderInfo) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Tracking number not found in this order!"
+    );
+  }
+
+  // ✅ Final structured response
+  const orderWithTracking = {
+    _id: result._id,
+    orderInfo: [matchedOrderInfo],
+    customerInfo: result.customerInfo,
+    paymentInfo: result.paymentInfo,
+    totalAmount: result.totalAmount,
+  };
+
+  return orderWithTracking;
+};
+
+export const OrderServices = {
+  getOrderByTrackingNumberFromDB,
+};
+
 // Get order summary (pending/completed counts and totals)
 const getOrderSummaryFromDB = async () => {
   // Aggregate orders data
@@ -119,5 +169,6 @@ export const orderServices = {
   createOrderIntoDB,
   updateOrderInDB,
   getOrderSummaryFromDB,
+  getOrderByTrackingNumberFromDB,
   getMyOrdersFromDB,
 };

@@ -94,7 +94,7 @@ const orderInfoSchema = new Schema<TOrderInfo>(
     },
     productInfo: {
       type: Schema.Types.ObjectId,
-      ref: "product",
+      ref: "Product",
       required: true,
     },
     trackingNumber: {
