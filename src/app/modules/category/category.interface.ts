@@ -4,7 +4,15 @@ type TIcon = {
 };
 
 export type TCategory = {
-  mainCategory: string;
+  mainCategory:
+    | "book"
+    | "electronics"
+    | "superstore"
+    | "kids-zone"
+    | "corporate-order"
+    | "best-seller-award"
+    | "offer"
+    | "just-for-you";
   name: string;
   slug?: string;
   details: string;
