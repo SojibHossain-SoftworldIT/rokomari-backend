@@ -1,11 +1,12 @@
 export type TCoupon = {
-  image: string;
+  image?: string;
   code: string;
-  description: string;
-  type: "fixed" | "percentage" | "fixed";
+  description?: string;
+  type: "fixed" | "percentage" | "free-shipping";
   discountAmount: number;
+  minimumPurchaseAmount: number;
   isVerifiedCustomer?: boolean;
   isApproved?: boolean;
-  activeDate: Date;
+  activeDate?: Date;
   expireDate: Date;
 };

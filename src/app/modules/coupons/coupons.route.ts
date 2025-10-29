@@ -14,5 +14,12 @@ router.post(
   validateRequest(createCouponZodSchema),
   couponControllers.createCoupon
 );
+router.patch(
+  "/:id",
+  validateRequest(createCouponZodSchema),
+  couponControllers.updateCoupon
+);
+
+router.delete("/:id", couponControllers.deleteCoupon);
 
 export const CouponRoutes = router;

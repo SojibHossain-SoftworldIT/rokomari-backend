@@ -1,6 +1,6 @@
+import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import httpStatus from "http-status";
 import { couponServices } from "./coupons.service";
 
 const getAllCoupons = catchAsync(async (req, res) => {
@@ -38,8 +38,35 @@ const createCoupon = catchAsync(async (req, res) => {
   });
 });
 
+const updateCoupon = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const couponData = req.body;
+  const result = await couponServices.updateCouponIntoDB(id, couponData);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Coupon updated successfully!",
+    data: result,
+  });
+});
+
+const deleteCoupon = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const result = await couponServices.deleteCouponFromDB(id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Coupon deleted successfully!",
+    data: result,
+  });
+});
+
 export const couponControllers = {
   getAllCoupons,
   getSingleCoupon,
   createCoupon,
+  updateCoupon,
+  deleteCoupon,
 };
