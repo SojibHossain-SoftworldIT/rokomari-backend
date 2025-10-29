@@ -5,6 +5,7 @@ import AppError from "../../errors/handleAppError";
 import { OrderSearchableFields } from "./order.consts";
 import { TOrder } from "./order.interface";
 import { OrderModel } from "./order.model";
+import { ProductModel } from "../product/product.model";
 
 const getAllOrdersFromDB = async (query: Record<string, unknown>) => {
   const orderQuery = new QueryBuilder(OrderModel.find(), query)
@@ -42,6 +43,32 @@ const getMyOrdersFromDB = async (
     .fields();
 
   const result = await orderQuery.modelQuery;
+
+  return result;
+};
+
+// Get order by tracking number
+const getOrderByTrxFromDB = async (trackingNumber: string) => {
+  if (!trackingNumber) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Tracking number is required!");
+  }
+
+  // Force model registration (add this line)
+  ProductModel;
+
+  const result = await OrderModel.findOne({
+    "orderInfo.trackingNumber": trackingNumber,
+  })
+    .populate("orderInfo.productInfo", "description featuredImg productInfo")
+    .populate("orderInfo.orderBy", "name email phone")
+    .lean();
+
+  if (!result) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "No order found for this tracking number!"
+    );
+  }
 
   return result;
 };
@@ -116,6 +143,7 @@ const updateOrderInDB = async (id: string, payload: Partial<TOrder>) => {
 export const orderServices = {
   getAllOrdersFromDB,
   getSingleOrderFromDB,
+  getOrderByTrxFromDB,
   createOrderIntoDB,
   updateOrderInDB,
   getOrderSummaryFromDB,

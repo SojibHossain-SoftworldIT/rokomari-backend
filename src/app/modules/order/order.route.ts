@@ -11,6 +11,8 @@ router.get("/order-summary", orderControllers.getOrderSummary);
 
 router.get("/my-order/:id", orderControllers.getMyOrders);
 
+router.get("/track/:trackingNumber", orderControllers.getOrderByTrx);
+
 router.get("/:id", orderControllers.getSingleOrder);
 
 router.post(

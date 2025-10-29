@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { orderServices } from "./order.service";
+import { get } from "http";
 
 const getAllOrder = catchAsync(async (req, res) => {
   const result = await orderServices.getAllOrdersFromDB(req.query);
@@ -36,6 +37,18 @@ const getSingleOrder = catchAsync(async (req, res) => {
     success: true,
     statusCode: httpStatus.OK,
     message: "Order retrieve successfully!",
+    data: result,
+  });
+});
+
+export const getOrderByTrx = catchAsync(async (req, res) => {
+  const { trackingNumber } = req.params;
+  const result = await orderServices.getOrderByTrxFromDB(trackingNumber);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Order fetched successfully!",
     data: result,
   });
 });
@@ -80,6 +93,7 @@ const updateOrder = catchAsync(async (req, res) => {
 export const orderControllers = {
   getAllOrder,
   getSingleOrder,
+  getOrderByTrx,
   createOrder,
   updateOrder,
   getMyOrders,
