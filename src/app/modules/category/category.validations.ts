@@ -14,12 +14,16 @@ import { z } from "zod";
 // });
 
 export const createCategoryZodSchema = z.object({
-  mainCategory: z.string({
-    error: (issue) =>
-      issue.input === undefined
-        ? "Main category is required!"
-        : "Not a string!",
-  }),
+  mainCategory: z.enum([
+    "book",
+    "electronics",
+    "superstore",
+    "kids-zone",
+    "corporate-order",
+    "best-seller-award",
+    "offer",
+    "just-for-you",
+  ]),
   name: z.string({
     error: (issue) =>
       issue.input === undefined
