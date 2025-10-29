@@ -1,6 +1,7 @@
 import QueryBuilder from "../../builder/QueryBuilder";
 import { deleteImageFromCLoudinary } from "../../config/cloudinary.config";
 import AppError from "../../errors/handleAppError";
+import { CategoryModel } from "../category/category.model";
 import { ProductSearchableFields } from "./product.const";
 import { TProduct } from "./product.interface";
 import { ProductModel } from "./product.model";
@@ -17,12 +18,40 @@ const normalizeBinding = (binding?: string) => {
 // };
 
 // 🔹 Create product
+// const createProductOnDB = async (payload: TProduct) => {
+//   // Ensure salePrice is defined if isOnSale is true
+//   if (payload.bookInfo?.specification?.binding) {
+//     payload.bookInfo.specification.binding = normalizeBinding(
+//       payload.bookInfo.specification.binding
+//     ) as "hardcover" | "paperback";
+//   }
+
+//   const result = await ProductModel.create(payload);
+//   return result;
+// };
+
 const createProductOnDB = async (payload: TProduct) => {
-  // Ensure salePrice is defined if isOnSale is true
-  if (payload.bookInfo?.specification?.binding) {
-    payload.bookInfo.specification.binding = normalizeBinding(
-      payload.bookInfo.specification.binding
-    ) as "hardcover" | "paperback";
+  // 🔹 Fetch category to check if it's a Book-type product
+  // Use a type assertion because 'category' is not declared on TProduct in the current interface.
+  const categoryId = (payload as any).category;
+  const category = await CategoryModel.findById(categoryId).populate(
+    "mainCategory"
+  );
+
+  const isBook =
+    // category?.name?.toLowerCase() === "book" ||
+    category?.mainCategory?.toLowerCase() === "book";
+
+  // 🔹 Conditionally process bookInfo
+  if (isBook) {
+    if (payload.bookInfo?.specification?.binding) {
+      payload.bookInfo.specification.binding = normalizeBinding(
+        payload.bookInfo.specification.binding
+      ) as "hardcover" | "paperback";
+    }
+  } else {
+    // 🧹 Remove bookInfo if category is not a book
+    delete (payload as any).bookInfo;
   }
 
   const result = await ProductModel.create(payload);
