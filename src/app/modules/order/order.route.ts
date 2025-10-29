@@ -13,6 +13,8 @@ router.get("/my-order/:id", orderControllers.getMyOrders);
 
 router.get("/:id", orderControllers.getSingleOrder);
 
+router.get("/track/:trackingNumber", orderControllers.getOrderByTrackingNumber);
+
 router.post(
   "/create-order",
   validateRequest(createOrderZodSchema),

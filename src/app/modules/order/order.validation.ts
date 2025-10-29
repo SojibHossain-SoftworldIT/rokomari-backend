@@ -122,14 +122,7 @@ const paymentInfoZodSchema = z.union([
 
 // Order Info Validation
 const orderInfoZodSchema = z.object({
-  orderBy: objectIdSchema.or(
-    z.string({
-      error: (issue) =>
-        issue.input === undefined
-          ? "OrderBy is required!"
-          : "Must be a valid ObjectId string!",
-    })
-  ),
+  orderBy: objectIdSchema.or(z.string().optional()),
   productInfo: objectIdSchema.or(
     z.string({
       error: (issue) =>

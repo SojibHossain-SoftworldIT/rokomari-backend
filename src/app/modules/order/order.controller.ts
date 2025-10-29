@@ -40,6 +40,24 @@ const getSingleOrder = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * ✅ Get Order by Tracking Number (Public Route)
+ */
+const getOrderByTrackingNumber = catchAsync(async (req, res) => {
+  const { trackingNumber } = req.params;
+
+  const result = await orderServices.getOrderByTrackingNumberFromDB(
+    trackingNumber
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Order retrieved successfully by tracking number!",
+    data: result,
+  });
+});
+
 const getOrderSummary = catchAsync(async (req, res) => {
   const result = await orderServices.getOrderSummaryFromDB();
 
@@ -84,4 +102,5 @@ export const orderControllers = {
   updateOrder,
   getMyOrders,
   getOrderSummary,
+  getOrderByTrackingNumber,
 };

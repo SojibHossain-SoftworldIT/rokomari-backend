@@ -90,11 +90,10 @@ const orderInfoSchema = new Schema<TOrderInfo>(
     orderBy: {
       type: Schema.Types.ObjectId,
       ref: "customer",
-      required: true,
     },
     productInfo: {
       type: Schema.Types.ObjectId,
-      ref: "product",
+      ref: "Product",
       required: true,
     },
     trackingNumber: {
