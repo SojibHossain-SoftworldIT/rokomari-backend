@@ -130,7 +130,7 @@ const specificationSchema = new Schema<TSpecification>(
 // BookInfo Schema
 const bookInfoSchema = new Schema<TBookInfo>(
   {
-    specification: { type: specificationSchema, required: true },
+    specification: { type: specificationSchema, required: false },
     format: {
       type: String,
       enum: ["hardcover", "paperback", "ebook", "audiobook"],
