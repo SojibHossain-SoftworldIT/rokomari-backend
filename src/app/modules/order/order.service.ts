@@ -132,6 +132,58 @@ const getOrderSummaryFromDB = async () => {
     totalCompletedAmount,
   };
 };
+const getOrderRangeSummaryFromDB = async (
+  startDate: string,
+  endDate: string
+) => {
+  // Parse dates and set time range
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  end.setHours(23, 59, 59, 999); // Include full end day
+
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid date format!");
+  }
+
+  // Fetch orders within date range
+  const orders = await OrderModel.find({
+    createdAt: { $gte: start, $lte: end },
+  }).lean();
+
+  let totalOrders = orders.length;
+  let totalPendingOrders = 0;
+  let totalCompletedOrders = 0;
+  let totalPendingAmount = 0;
+  let totalCompletedAmount = 0;
+
+  orders.forEach((order) => {
+    if (Array.isArray(order.orderInfo) && order.orderInfo.length > 0) {
+      // Assuming first orderInfo status represents the whole order
+      const status = order.orderInfo[0].status;
+      const total = order.totalAmount || 0;
+
+      if (status === "pending") {
+        totalPendingOrders++;
+        totalPendingAmount += total;
+      } else if (status === "completed") {
+        totalCompletedOrders++;
+        totalCompletedAmount += total;
+      }
+    }
+  });
+
+  return {
+    totalOrders,
+    totalPendingOrders,
+    totalCompletedOrders,
+    totalPendingAmount: Number(totalPendingAmount.toFixed(2)),
+    totalCompletedAmount: Number(totalCompletedAmount.toFixed(2)),
+    dateRange: {
+      start: start.toISOString().split("T")[0],
+      end: end.toISOString().split("T")[0],
+    },
+  };
+};
 
 const getSingleOrderFromDB = async (id: string) => {
   const result = OrderModel.findById(id);
@@ -163,6 +215,39 @@ const updateOrderInDB = async (id: string, payload: Partial<TOrder>) => {
   return result;
 };
 
+const changeOrderStatusInDB = async (orderId: string, newStatus: string) => {
+  // Valid status validation
+  const validStatuses = [
+    "pending",
+    "processing",
+    "at-local-facility",
+    "out-for-delivery",
+    "cancelled",
+    "completed",
+  ];
+
+  if (!validStatuses.includes(newStatus)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid status value!");
+  }
+
+  // Update all orderInfo.status in the array
+  const result = await OrderModel.findByIdAndUpdate(
+    orderId,
+    {
+      $set: {
+        "orderInfo.$[].status": newStatus, // Update all array elements
+      },
+    },
+    { new: true, runValidators: true }
+  ).lean();
+
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, "Order not found!");
+  }
+
+  return result;
+};
+
 export const orderServices = {
   getAllOrdersFromDB,
   getSingleOrderFromDB,
@@ -171,4 +256,6 @@ export const orderServices = {
   getOrderSummaryFromDB,
   getOrderByTrackingNumberFromDB,
   getMyOrdersFromDB,
+  getOrderRangeSummaryFromDB,
+  changeOrderStatusInDB,
 };
