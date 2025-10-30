@@ -154,7 +154,7 @@ const getSingleProductFromDB = async (id: string) => {
     .populate("categoryAndTags.publisher")
     .populate("categoryAndTags.categories")
     .populate("categoryAndTags.tags")
-    .populate("bookInfo.specification.authors ");
+    .populate("bookInfo.specification.authors");
 };
 
 const updateProductOnDB = async (
