@@ -4,6 +4,7 @@ export type TCategoriesAndTags = {
   publisher?: string; // Name of the publisher
   categories: Types.ObjectId[];
   tags: Types.ObjectId[];
+  subCategories?: string[];
 };
 
 // export type TCategoryAndTags = {
