@@ -23,6 +23,7 @@ app.use(
       "https://rokomari-admin-panel.vercel.app",
       "https://www.bdmbazar.com",
       "https://rokomari-customer-seven.vercel.app",
+      "*"
     ],
     credentials: true,
   })
