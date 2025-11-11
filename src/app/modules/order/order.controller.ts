@@ -29,6 +29,17 @@ const getMyOrders = catchAsync(async (req, res) => {
   });
 });
 
+const recentlyOrderedProducts = catchAsync(async (req, res) => {
+  const result = await orderServices.recentlyOrderedProductsFromDB();
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Recently ordered products retrieved successfully!",
+    data: result,
+  });
+});
+
 const getSingleOrder = catchAsync(async (req, res) => {
   const id = req.params.id;
   const result = await orderServices.getSingleOrderFromDB(id);
@@ -140,6 +151,7 @@ export const orderControllers = {
   updateOrder,
   getMyOrders,
   getOrderSummary,
+  recentlyOrderedProducts,
   getOrderByTrackingNumber,
   getOrderRangeSummary,
   changeOrderStatus,

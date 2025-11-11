@@ -11,6 +11,7 @@ const router = express.Router();
 router.get("/", orderControllers.getAllOrder);
 
 router.get("/order-summary", orderControllers.getOrderSummary);
+router.get("/recently-sold-products", orderControllers.recentlyOrderedProducts);
 router.get("/order-range-summary", orderControllers.getOrderRangeSummary);
 
 router.get("/my-order/:id", orderControllers.getMyOrders);
