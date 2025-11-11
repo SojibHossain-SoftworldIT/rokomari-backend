@@ -264,6 +264,19 @@ const searchProducts = catchAsync(async (req, res) => {
   });
 });
 
+const getProductsByAuthor = catchAsync(async (req, res) => {
+  const { authorId } = req.params;
+  const result = await productServices.getProductsByAuthorFromDB(authorId, req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Products by author retrieved successfully!",
+    data: result.data,
+    meta: result.meta,
+  });
+});
+
 export const productControllers = {
   createProduct,
   getSingleProduct,
@@ -272,4 +285,5 @@ export const productControllers = {
   getAllProduct,
   updateProduct,
   getProductsByCategoryandTag,
+  getProductsByAuthor,
 };

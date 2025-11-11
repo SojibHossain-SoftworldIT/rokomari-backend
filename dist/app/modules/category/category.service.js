@@ -23,6 +23,9 @@ const getAllCategoryFromDB = () => __awaiter(void 0, void 0, void 0, function* (
 const getSingleCategoryFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return yield category_model_1.CategoryModel.findById(id);
 });
+const feauturedCategoriesFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
+    return yield category_model_1.CategoryModel.find({ feautured: true });
+});
 const createCategoryIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const isCategoryExists = yield category_model_1.CategoryModel.findOne({ name: payload === null || payload === void 0 ? void 0 : payload.name });
     if (isCategoryExists) {
@@ -68,6 +71,7 @@ exports.categoryServices = {
     getAllCategoryFromDB,
     updateCategoryInDB,
     getSingleCategoryFromDB,
+    feauturedCategoriesFromDB,
     createCategoryIntoDB,
     deleteCategoryFromDB,
 };

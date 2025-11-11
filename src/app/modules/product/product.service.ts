@@ -298,6 +298,30 @@ const searchProductsFromDB = async (query: string) => {
   return partialMatch;
 };
 
+const getProductsByAuthorFromDB = async (
+  authorId: string,
+  query: Record<string, unknown>
+) => {
+  const productQuery = new QueryBuilder(
+    ProductModel.find({
+      "bookInfo.specification.authors": authorId,
+    })
+      .populate("categoryAndTags.categories")
+      .populate("categoryAndTags.tags")
+      .populate("bookInfo.specification.authors"),
+    query
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const data = await productQuery.modelQuery;
+  const meta = await productQuery.countTotal();
+
+  return { meta, data };
+};
+
 export const productServices = {
   createProductOnDB,
   getAllProductFromDB,
@@ -306,4 +330,5 @@ export const productServices = {
   getProductsByCategoryandTag,
   getSingleProductFromDB,
   updateProductOnDB,
+  getProductsByAuthorFromDB,
 };

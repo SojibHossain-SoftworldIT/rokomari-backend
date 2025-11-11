@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.orderServices = void 0;
+exports.orderServices = exports.OrderServices = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const nanoid_1 = require("nanoid");
 const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
@@ -26,8 +26,14 @@ const getAllOrdersFromDB = (query) => __awaiter(void 0, void 0, void 0, function
         .sort()
         .paginate()
         .fields();
-    const result = yield orderQuery.modelQuery;
-    return result;
+    // ✅ Execute main query for product data
+    const data = yield orderQuery.modelQuery;
+    // ✅ Use built-in countTotal() from QueryBuilder
+    const meta = yield orderQuery.countTotal();
+    return {
+        meta,
+        data,
+    };
 });
 //get my orders
 const getMyOrdersFromDB = (customerId, query) => __awaiter(void 0, void 0, void 0, function* () {
@@ -41,6 +47,41 @@ const getMyOrdersFromDB = (customerId, query) => __awaiter(void 0, void 0, void 
     const result = yield orderQuery.modelQuery;
     return result;
 });
+/**
+ * ✅ Get Order by Tracking Number (Public - no authentication required)
+ */
+const getOrderByTrackingNumberFromDB = (trackingNumber) => __awaiter(void 0, void 0, void 0, function* () {
+    // Find the order by nested field `orderInfo.trackingNumber`
+    const result = yield order_model_1.OrderModel.findOne({
+        "orderInfo.trackingNumber": trackingNumber,
+    })
+        .populate({
+        path: "orderInfo.productInfo",
+        select: "description.name productInfo.price productInfo.salePrice featuredImg",
+    })
+        .lean(); // ✅ use .lean() for plain JS object (no Mongoose document overhead)
+    if (!result) {
+        throw new handleAppError_1.default(http_status_1.default.NOT_FOUND, "Order not found with this tracking number!");
+    }
+    // ✅ Find the specific orderInfo that matches this tracking number
+    const matchedOrderInfo = result.orderInfo.find((info) => info.trackingNumber === trackingNumber);
+    if (!matchedOrderInfo) {
+        throw new handleAppError_1.default(http_status_1.default.NOT_FOUND, "Tracking number not found in this order!");
+    }
+    // ✅ Final structured response
+    const orderWithTracking = {
+        _id: result._id,
+        orderInfo: [matchedOrderInfo],
+        customerInfo: result.customerInfo,
+        paymentInfo: result.paymentInfo,
+        totalAmount: result.totalAmount,
+        createdAt: result.createdAt,
+    };
+    return orderWithTracking;
+});
+exports.OrderServices = {
+    getOrderByTrackingNumberFromDB,
+};
 // Get order summary (pending/completed counts and totals)
 const getOrderSummaryFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
     // Aggregate orders data
@@ -74,6 +115,50 @@ const getOrderSummaryFromDB = () => __awaiter(void 0, void 0, void 0, function* 
         totalCompletedAmount,
     };
 });
+const getOrderRangeSummaryFromDB = (startDate, endDate) => __awaiter(void 0, void 0, void 0, function* () {
+    // Parse dates and set time range
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999); // Include full end day
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        throw new handleAppError_1.default(http_status_1.default.BAD_REQUEST, "Invalid date format!");
+    }
+    // Fetch orders within date range
+    const orders = yield order_model_1.OrderModel.find({
+        createdAt: { $gte: start, $lte: end },
+    }).lean();
+    let totalOrders = orders.length;
+    let totalPendingOrders = 0;
+    let totalCompletedOrders = 0;
+    let totalPendingAmount = 0;
+    let totalCompletedAmount = 0;
+    orders.forEach((order) => {
+        if (Array.isArray(order.orderInfo) && order.orderInfo.length > 0) {
+            // Assuming first orderInfo status represents the whole order
+            const status = order.orderInfo[0].status;
+            const total = order.totalAmount || 0;
+            if (status === "pending") {
+                totalPendingOrders++;
+                totalPendingAmount += total;
+            }
+            else if (status === "completed") {
+                totalCompletedOrders++;
+                totalCompletedAmount += total;
+            }
+        }
+    });
+    return {
+        totalOrders,
+        totalPendingOrders,
+        totalCompletedOrders,
+        totalPendingAmount: Number(totalPendingAmount.toFixed(2)),
+        totalCompletedAmount: Number(totalCompletedAmount.toFixed(2)),
+        dateRange: {
+            start: start.toISOString().split("T")[0],
+            end: end.toISOString().split("T")[0],
+        },
+    };
+});
 const getSingleOrderFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = order_model_1.OrderModel.findById(id);
     if (!result) {
@@ -96,11 +181,38 @@ const updateOrderInDB = (id, payload) => __awaiter(void 0, void 0, void 0, funct
     const result = yield order_model_1.OrderModel.findByIdAndUpdate(id, payload, { new: true });
     return result;
 });
+const changeOrderStatusInDB = (orderId, newStatus) => __awaiter(void 0, void 0, void 0, function* () {
+    // Valid status validation
+    const validStatuses = [
+        "pending",
+        "processing",
+        "at-local-facility",
+        "out-for-delivery",
+        "cancelled",
+        "completed",
+    ];
+    if (!validStatuses.includes(newStatus)) {
+        throw new handleAppError_1.default(http_status_1.default.BAD_REQUEST, "Invalid status value!");
+    }
+    // Update all orderInfo.status in the array
+    const result = yield order_model_1.OrderModel.findByIdAndUpdate(orderId, {
+        $set: {
+            "orderInfo.$[].status": newStatus, // Update all array elements
+        },
+    }, { new: true, runValidators: true }).lean();
+    if (!result) {
+        throw new handleAppError_1.default(http_status_1.default.NOT_FOUND, "Order not found!");
+    }
+    return result;
+});
 exports.orderServices = {
     getAllOrdersFromDB,
     getSingleOrderFromDB,
     createOrderIntoDB,
     updateOrderInDB,
     getOrderSummaryFromDB,
+    getOrderByTrackingNumberFromDB,
     getMyOrdersFromDB,
+    getOrderRangeSummaryFromDB,
+    changeOrderStatusInDB,
 };

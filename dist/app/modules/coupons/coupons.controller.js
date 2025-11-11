@@ -13,9 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.couponControllers = void 0;
+const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
-const http_status_1 = __importDefault(require("http-status"));
 const coupons_service_1 = require("./coupons.service");
 const getAllCoupons = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield coupons_service_1.couponServices.getAllCouponsFromDB(req.query);
@@ -46,8 +46,31 @@ const createCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         data: result,
     });
 }));
+const updateCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const couponData = req.body;
+    const result = yield coupons_service_1.couponServices.updateCouponIntoDB(id, couponData);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Coupon updated successfully!",
+        data: result,
+    });
+}));
+const deleteCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const result = yield coupons_service_1.couponServices.deleteCouponFromDB(id);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Coupon deleted successfully!",
+        data: result,
+    });
+}));
 exports.couponControllers = {
     getAllCoupons,
     getSingleCoupon,
     createCoupon,
+    updateCoupon,
+    deleteCoupon,
 };

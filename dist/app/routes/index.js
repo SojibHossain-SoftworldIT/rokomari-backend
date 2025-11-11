@@ -6,10 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const attributes_route_1 = require("../modules/attributes/attributes.route");
 const auth_routes_1 = require("../modules/auth/auth.routes");
+const authors_routes_1 = require("../modules/authors/authors.routes");
 const becomeSellerReview_routes_1 = require("../modules/becomeSellerReview/becomeSellerReview.routes");
 const brands_routes_1 = require("../modules/brands/brands.routes");
 const category_routes_1 = require("../modules/category/category.routes");
 const coupons_route_1 = require("../modules/coupons/coupons.route");
+const steadfast_routes_1 = require("../modules/courier/steadfast.routes");
 const customer_route_1 = require("../modules/customer/customer.route");
 const dashboard_routes_1 = require("../modules/dashboard/dashboard.routes");
 const faq_route_1 = require("../modules/faq/faq.route");
@@ -36,6 +38,10 @@ const moduleRoutes = [
     {
         path: "/auth",
         route: auth_routes_1.AuthRoutes,
+    },
+    {
+        path: "/author",
+        route: authors_routes_1.AuthorRoutes,
     },
     {
         path: "/user",
@@ -140,6 +146,10 @@ const moduleRoutes = [
     {
         path: "/settings",
         route: settings_routes_1.settingsRoutes,
+    },
+    {
+        path: "/steadfast",
+        route: steadfast_routes_1.steadfastRoutes,
     },
 ];
 moduleRoutes.forEach((route) => router.use(route === null || route === void 0 ? void 0 : route.path, route === null || route === void 0 ? void 0 : route.route));

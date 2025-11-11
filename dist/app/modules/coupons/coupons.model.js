@@ -5,7 +5,7 @@ const mongoose_1 = require("mongoose");
 const couponSchema = new mongoose_1.Schema({
     image: {
         type: String,
-        required: [true, "Image is Required!"],
+        // required: [true, "Image is Required!"],
     },
     code: {
         type: String,
@@ -13,16 +13,21 @@ const couponSchema = new mongoose_1.Schema({
     },
     description: {
         type: String,
-        required: [true, "Description is Required!"],
+        // required: [true, "Description is Required!"],
     },
     type: {
         type: String,
-        enum: ["fixed", "percentage", "fixed"],
+        enum: ["fixed", "percentage", "free-shipping"],
         required: [true, "Type is Required!"],
     },
     discountAmount: {
         type: Number,
         required: [true, "A discount amount is Required!"],
+        default: 0,
+    },
+    minimumPurchaseAmount: {
+        type: Number,
+        required: [true, "Minimum purchase amount is Required!"],
     },
     isVerifiedCustomer: {
         type: Boolean,
@@ -34,7 +39,7 @@ const couponSchema = new mongoose_1.Schema({
     },
     activeDate: {
         type: Date,
-        required: [true, "Active date is Required!"],
+        // required: [true, "Active date is Required!"],
     },
     expireDate: {
         type: Date,
