@@ -68,8 +68,26 @@ const updateReview = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
     const { id } = req.params;
     const files = req.files;
     const updatedData = Object.assign({}, req.body);
-    if ((_a = files === null || files === void 0 ? void 0 : files.photos) === null || _a === void 0 ? void 0 : _a.length) {
-        updatedData.photos = files.photos.map((f) => f.path);
+    // if (files?.photos?.length) {
+    //   updatedData.photos = files.photos.map((f) => f.path);
+    // }
+    // Handle gallery images
+    if ((_a = files["photos"]) === null || _a === void 0 ? void 0 : _a.length) {
+        const newPhotosImages = files["photos"].map((f) => f.path);
+        // Merge with existing gallery images (if provided)
+        updatedData.photos = Array.isArray(updatedData.photos)
+            ? [...updatedData.photos, ...newPhotosImages]
+            : newPhotosImages;
+    }
+    else if (updatedData.photos) {
+        try {
+            updatedData.photos = Array.isArray(updatedData.photos)
+                ? updatedData.photos
+                : JSON.parse(updatedData.photos);
+        }
+        catch (_b) {
+            updatedData.photos = [updatedData.photos];
+        }
     }
     const result = yield review_service_1.reviewServices.updateReviewOnDB(id, updatedData);
     (0, sendResponse_1.default)(res, {

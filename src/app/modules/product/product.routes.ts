@@ -17,6 +17,8 @@ router.get("/:id", productControllers.getSingleProduct);
 
 router.get("/products/by", productControllers.getProductsByCategoryandTag);
 
+router.get("/by-author/:authorId", productControllers.getProductsByAuthor);
+
 router.post(
   "/create-product",
   multerUpload.fields([

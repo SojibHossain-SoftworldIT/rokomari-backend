@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.settingsControllers = void 0;
+exports.settingsControllers = exports.getDeliveryCharge = exports.getMobileMfs = exports.getContactAndSocial = exports.getSliderImages = exports.getLogo = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
@@ -38,7 +38,7 @@ const createSettings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
-// ✅ Get Settings
+// ✅ Get All Settings data
 const getSettings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield settings_service_1.settingsServices.getSettingsFromDB();
     (0, sendResponse_1.default)(res, {
@@ -48,27 +48,57 @@ const getSettings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
         data: result,
     });
 }));
+// ✅ Get Logo
+exports.getLogo = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield settings_service_1.settingsServices.getLogoFromDB();
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Logo retrieved successfully!",
+        data: result,
+    });
+}));
+// ✅ Get Slider Images
+exports.getSliderImages = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield settings_service_1.settingsServices.getSliderImagesFromDB();
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Slider images retrieved successfully!",
+        data: result,
+    });
+}));
+// ✅ Get Contact & Social
+exports.getContactAndSocial = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield settings_service_1.settingsServices.getContactAndSocialFromDB();
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Contact & social info retrieved successfully!",
+        data: result,
+    });
+}));
+// ✅ Get Mobile MFS
+exports.getMobileMfs = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield settings_service_1.settingsServices.getMobileMfsFromDB();
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Mobile MFS info retrieved successfully!",
+        data: result,
+    });
+}));
+// ✅ Get Delivery Charge
+exports.getDeliveryCharge = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield settings_service_1.settingsServices.getDeliveryChargeFromDB();
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Delivery charge retrieved successfully!",
+        data: result,
+    });
+}));
 // ✅ Update Settings
-// const updateSettings = catchAsync(async (req, res) => {
-//   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-//   const updatedData: any = { ...req.body };
-//   if (files?.logo?.length) {
-//     updatedData.logo = files.logo[0].path;
-//   }
-//   if (files?.sliderImages?.length) {
-//     updatedData.sliderImages = files.sliderImages.map((f) => f.path);
-//   }
-//   if (files?.popupImage?.length) {
-//     updatedData.popupImage = files.popupImage[0].path;
-//   }
-//   const result = await settingsServices.updateSettingsOnDB(updatedData);
-//   sendResponse(res, {
-//     success: true,
-//     statusCode: httpStatus.OK,
-//     message: "Settings updated successfully!",
-//     data: result,
-//   });
-// });
 const updateSettings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e, _f, _g;
     const files = req.files;
@@ -105,8 +135,53 @@ const updateSettings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+const updateMfsSettings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d;
+    const files = req.files;
+    const updatedData = {};
+    // ✅ Parse JSON body if sent as string (common in multipart/form-data)
+    if (typeof req.body.mobileMfs === "string") {
+        try {
+            updatedData.mobileMfs = JSON.parse(req.body.mobileMfs);
+        }
+        catch (err) {
+            console.error("Failed to parse mobileMfs JSON:", err);
+            updatedData.mobileMfs = {};
+        }
+    }
+    else {
+        updatedData.mobileMfs = req.body.mobileMfs || {};
+    }
+    // ✅ Handle file uploads safely
+    if ((_a = files === null || files === void 0 ? void 0 : files.bKashLogo) === null || _a === void 0 ? void 0 : _a.length) {
+        updatedData.mobileMfs.bKash = Object.assign(Object.assign({}, (updatedData.mobileMfs.bKash || {})), { bKashLogo: files.bKashLogo[0].path });
+    }
+    if ((_b = files === null || files === void 0 ? void 0 : files.nagadLogo) === null || _b === void 0 ? void 0 : _b.length) {
+        updatedData.mobileMfs.nagad = Object.assign(Object.assign({}, (updatedData.mobileMfs.nagad || {})), { nagadLogo: files.nagadLogo[0].path });
+    }
+    if ((_c = files === null || files === void 0 ? void 0 : files.rocketLogo) === null || _c === void 0 ? void 0 : _c.length) {
+        updatedData.mobileMfs.rocket = Object.assign(Object.assign({}, (updatedData.mobileMfs.rocket || {})), { rocketLogo: files.rocketLogo[0].path });
+    }
+    if ((_d = files === null || files === void 0 ? void 0 : files.upayLogo) === null || _d === void 0 ? void 0 : _d.length) {
+        updatedData.mobileMfs.upay = Object.assign(Object.assign({}, (updatedData.mobileMfs.upay || {})), { upayLogo: files.upayLogo[0].path });
+    }
+    // ✅ Call service
+    const result = yield settings_service_1.settingsServices.updateMfsSettingsOnDB(updatedData);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Mobile MFS settings updated successfully!",
+        data: result,
+    });
+}));
 exports.settingsControllers = {
     createSettings,
     getSettings,
     updateSettings,
+    updateMfsSettings,
+    getLogo: exports.getLogo,
+    getSliderImages: exports.getSliderImages,
+    getContactAndSocial: exports.getContactAndSocial,
+    getMobileMfs: exports.getMobileMfs,
+    getDeliveryCharge: exports.getDeliveryCharge,
 };

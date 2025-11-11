@@ -15,6 +15,16 @@ const zod_1 = require("zod");
 //     .url("Invalid icon URL!"),
 // });
 exports.createCategoryZodSchema = zod_1.z.object({
+    mainCategory: zod_1.z.enum([
+        "book",
+        "electronics",
+        "superstore",
+        "kids-zone",
+        "corporate-order",
+        "best-seller-award",
+        "offer",
+        "just-for-you",
+    ]),
     name: zod_1.z.string({
         error: (issue) => issue.input === undefined
             ? "Category name is required!"
@@ -43,5 +53,6 @@ exports.createCategoryZodSchema = zod_1.z.object({
     //   })
     //   .url("Invalid banner image URL!"),
     bannerImg: zod_1.z.string().optional(),
+    feautured: zod_1.z.boolean().optional(),
     subCategories: zod_1.z.array(zod_1.z.string()).default([]),
 });

@@ -13,11 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.couponServices = void 0;
+const http_status_1 = __importDefault(require("http-status"));
 const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const handleAppError_1 = __importDefault(require("../../errors/handleAppError"));
 const coupons_const_1 = require("./coupons.const");
 const coupons_model_1 = require("./coupons.model");
-const http_status_1 = __importDefault(require("http-status"));
 const getAllCouponsFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
     const couponQuery = new QueryBuilder_1.default(coupons_model_1.CouponModel.find(), query)
         .search(coupons_const_1.CouponSearchableFields)
@@ -43,8 +43,27 @@ const createCouponIntoDB = (payload) => __awaiter(void 0, void 0, void 0, functi
     const result = yield coupons_model_1.CouponModel.create(payload);
     return result;
 });
+const updateCouponIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const isCouponExists = yield coupons_model_1.CouponModel.findById(id);
+    if (!isCouponExists) {
+        throw new handleAppError_1.default(http_status_1.default.NOT_FOUND, "Coupon does not exists!");
+    }
+    const result = yield coupons_model_1.CouponModel.findByIdAndUpdate(id, payload, {
+        new: true,
+    });
+    return result;
+});
+const deleteCouponFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield coupons_model_1.CouponModel.findByIdAndDelete(id);
+    if (!result) {
+        throw new handleAppError_1.default(http_status_1.default.NOT_FOUND, "Coupon does not exists!");
+    }
+    return result;
+});
 exports.couponServices = {
     getAllCouponsFromDB,
     getSingleCouponFromDB,
     createCouponIntoDB,
+    updateCouponIntoDB,
+    deleteCouponFromDB,
 };

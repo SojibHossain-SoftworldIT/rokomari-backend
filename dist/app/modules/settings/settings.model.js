@@ -46,6 +46,7 @@ const settingsSchema = new mongoose_1.Schema({
         rocket: rocketSchema,
         upay: upaySchema,
     },
+    deliveryCharge: { type: Number, default: 0 },
     contactAndSocial: {
         address: { type: String },
         email: { type: String },

@@ -87,6 +87,7 @@ const getOrderByTrackingNumberFromDB = async (trackingNumber: string) => {
     customerInfo: result.customerInfo,
     paymentInfo: result.paymentInfo,
     totalAmount: result.totalAmount,
+    createdAt: result.createdAt,
   };
 
   return orderWithTracking;
