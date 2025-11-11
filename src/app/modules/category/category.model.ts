@@ -36,6 +36,10 @@ const categorySchema = new Schema<TCategory>(
       type: String,
       required: [true, "Category need a description!"],
     },
+    feautured: {
+      type: Boolean,
+      default: false,
+    },
     icon: iconSchema,
     image: {
       type: String,

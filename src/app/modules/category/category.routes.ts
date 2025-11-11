@@ -10,6 +10,8 @@ router.get("/", categoryControllers.getAllCategory);
 
 router.get("/:id", categoryControllers.getSingleCategory);
 
+router.get("/featured-categories", categoryControllers.getFeauturedCategories);
+
 router.post(
   "/create-category",
   multerUpload.fields([

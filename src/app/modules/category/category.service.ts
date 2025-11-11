@@ -12,6 +12,10 @@ const getSingleCategoryFromDB = async (id: string) => {
   return await CategoryModel.findById(id);
 };
 
+const feauturedCategoriesFromDB = async () => {
+  return await CategoryModel.find({ feautured: true });
+};
+
 const createCategoryIntoDB = async (payload: TCategory) => {
   const isCategoryExists = await CategoryModel.findOne({ name: payload?.name });
 
@@ -71,6 +75,7 @@ export const categoryServices = {
   getAllCategoryFromDB,
   updateCategoryInDB,
   getSingleCategoryFromDB,
+  feauturedCategoriesFromDB,
   createCategoryIntoDB,
   deleteCategoryFromDB,
 };

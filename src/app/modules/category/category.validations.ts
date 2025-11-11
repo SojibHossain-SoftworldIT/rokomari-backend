@@ -54,5 +54,6 @@ export const createCategoryZodSchema = z.object({
   //   })
   //   .url("Invalid banner image URL!"),
   bannerImg: z.string().optional(),
+  feautured: z.boolean().optional(),
   subCategories: z.array(z.string()).default([]),
 });

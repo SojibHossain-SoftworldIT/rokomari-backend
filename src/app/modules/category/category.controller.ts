@@ -24,6 +24,16 @@ const getSingleCategory = catchAsync(async (req, res) => {
   });
 });
 
+const getFeauturedCategories = catchAsync(async (req, res) => {
+  const result = await categoryServices.feauturedCategoriesFromDB();
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Feautured categories retrieved successfully!",
+    data: result,
+  });
+});
+
 // const createCategory = catchAsync(async (req, res) => {
 //   const files =
 //     (req.files as { [fieldname: string]: Express.Multer.File[] }) || {};
@@ -175,6 +185,7 @@ const deleteCategory = catchAsync(async (req, res) => {
 export const categoryControllers = {
   getAllCategory,
   getSingleCategory,
+  getFeauturedCategories,
   createCategory,
   updateCategory,
   deleteCategory,

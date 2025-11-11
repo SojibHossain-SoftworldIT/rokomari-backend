@@ -14,6 +14,7 @@ export type TCategory = {
     | "offer"
     | "just-for-you";
   name: string;
+  feautured?: boolean;
   slug?: string;
   details: string;
   icon?: TIcon;
