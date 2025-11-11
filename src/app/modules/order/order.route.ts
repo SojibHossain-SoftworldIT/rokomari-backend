@@ -8,6 +8,7 @@ const router = express.Router();
 router.get("/", orderControllers.getAllOrder);
 
 router.get("/order-summary", orderControllers.getOrderSummary);
+router.get("/recently-sold-products", orderControllers.recentlyOrderedProducts);
 
 router.get("/my-order/:id", orderControllers.getMyOrders);
 

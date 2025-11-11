@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import { nanoid } from "nanoid";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/handleAppError";
+import { ProductModel } from "../product/product.model";
 import { OrderSearchableFields } from "./order.consts";
 import { TOrder } from "./order.interface";
 import { OrderModel } from "./order.model";
@@ -26,7 +27,79 @@ const getAllOrdersFromDB = async (query: Record<string, unknown>) => {
   };
 };
 
+// const recentlyOrderedProductsFromDB = async () => {
+//   // Aggregate orders to find recently ordered products
+//   const recentOrders = await OrderModel.aggregate([
+//     { $unwind: "$orderInfo" },
+//     { $sort: { "orderInfo.orderDate": -1 } },
+//     {
+//       $group: {
+//         _id: "$orderInfo.productInfo",
+//         lastOrderedDate: { $first: "$orderInfo.orderDate" },
+//       },
+//     },
+//     { $sort: { lastOrderedDate: -1 } },
+//     { $limit: 12 }, // Get top 12 recently ordered products
+//   ]);
+
+//   // Extract product IDs
+//   const productIds = recentOrders.map((order) => order._id);
+
+//   return productIds;
+// };
+
 //get my orders
+
+const recentlyOrderedProductsFromDB = async () => {
+  // 🔹 Step 1: Aggregate to get recent product IDs from orders
+  const recentOrders = await OrderModel.aggregate([
+    { $unwind: "$orderInfo" },
+    { $sort: { "orderInfo.orderDate": -1 } },
+    {
+      $group: {
+        _id: "$orderInfo.productInfo", // store productId
+        lastOrderedDate: { $first: "$orderInfo.orderDate" },
+      },
+    },
+    { $sort: { lastOrderedDate: -1 } },
+    { $limit: 12 },
+  ]);
+
+  // 🔹 Step 2: Extract product IDs
+  const productIds = recentOrders.map((order) => order._id);
+
+  if (!productIds.length) return [];
+
+  // 🔹 Step 3: Fetch products with full population
+  const products = await ProductModel.find({ _id: { $in: productIds } })
+    .populate({
+      path: "categoryAndTags.categories",
+      select:
+        "mainCategory name slug details icon image bannerImg subCategories",
+    })
+    .populate({
+      path: "categoryAndTags.tags",
+      select: "name slug details icon image",
+    })
+    .populate({
+      path: "productInfo.brand",
+      select: "name logo slug",
+    })
+    .populate({
+      path: "bookInfo.specification.authors",
+      select: "name image description",
+    })
+    .lean()
+    .exec();
+
+  // 🔹 Step 4: Sort products in the same order as recentOrders
+  const sortedProducts = productIds.map((id) =>
+    products.find((p) => p._id.toString() === id.toString())
+  );
+
+  return sortedProducts.filter(Boolean);
+};
+
 const getMyOrdersFromDB = async (
   customerId: string,
   query: Record<string, unknown>
@@ -170,5 +243,6 @@ export const orderServices = {
   updateOrderInDB,
   getOrderSummaryFromDB,
   getOrderByTrackingNumberFromDB,
+  recentlyOrderedProductsFromDB,
   getMyOrdersFromDB,
 };
