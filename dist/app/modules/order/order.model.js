@@ -67,11 +67,10 @@ const orderInfoSchema = new mongoose_1.Schema({
     orderBy: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "customer",
-        required: true,
     },
     productInfo: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: "product",
+        ref: "Product",
         required: true,
     },
     trackingNumber: {

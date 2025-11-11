@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { orderServices } from "./order.service";
+import AppError from "../../errors/handleAppError";
 
 const getAllOrder = catchAsync(async (req, res) => {
   const result = await orderServices.getAllOrdersFromDB(req.query);
@@ -80,6 +81,29 @@ const getOrderSummary = catchAsync(async (req, res) => {
   });
 });
 
+const getOrderRangeSummary = catchAsync(async (req, res) => {
+  const { start, end } = req.query;
+
+  if (!start || !end) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Both 'start' and 'end' date query parameters are required!"
+    );
+  }
+
+  const result = await orderServices.getOrderRangeSummaryFromDB(
+    start as string,
+    end as string
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Order range summary retrieved successfully!",
+    data: result,
+  });
+});
+
 const createOrder = catchAsync(async (req, res) => {
   const orderData = req.body;
   const result = await orderServices.createOrderIntoDB(orderData);
@@ -106,6 +130,20 @@ const updateOrder = catchAsync(async (req, res) => {
   });
 });
 
+const changeOrderStatus = catchAsync(async (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+
+  const result = await orderServices.changeOrderStatusInDB(orderId, status);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Order status updated successfully!",
+    data: result,
+  });
+});
+
 export const orderControllers = {
   getAllOrder,
   getSingleOrder,
@@ -115,4 +153,6 @@ export const orderControllers = {
   getOrderSummary,
   recentlyOrderedProducts,
   getOrderByTrackingNumber,
+  getOrderRangeSummary,
+  changeOrderStatus,
 };

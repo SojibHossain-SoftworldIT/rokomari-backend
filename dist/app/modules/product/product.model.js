@@ -26,6 +26,7 @@ const categoryAndTagsSchema = new mongoose_1.Schema({
         { type: mongoose_1.Schema.Types.ObjectId, ref: "category", required: true },
     ],
     tags: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "tag", required: true }],
+    subCategories: [String],
 }, { _id: false });
 // Description Schema
 const descriptionSchema = new mongoose_1.Schema({
@@ -46,6 +47,7 @@ const externalSchema = new mongoose_1.Schema({
 }, { _id: false });
 // Product Info Schema
 const productInfoSchema = new mongoose_1.Schema({
+    productTitle: { type: String, required: true },
     price: { type: Number, required: true },
     brand: { type: mongoose_1.Schema.Types.ObjectId, ref: "brand" },
     salePrice: Number,
@@ -74,21 +76,25 @@ const productInfoSchema = new mongoose_1.Schema({
     inStock: { type: Boolean, default: true },
 }, { _id: false });
 // Author Schema
-const authorSchema = new mongoose_1.Schema({
-    name: { type: String, required: true },
-    image: String,
-    description: String,
-}, { _id: false });
+// const authorSchema = new Schema<TAuthor>(
+//   {
+//     name: { type: String, required: true },
+//     image: String,
+//     description: String,
+//   },
+//   { _id: false }
+// );
 // Specification Schema
 const specificationSchema = new mongoose_1.Schema({
-    authors: { type: [authorSchema], required: true },
+    authors: { type: [mongoose_1.Schema.Types.ObjectId], ref: "Author", required: true },
     publisher: {
         type: String,
-        required: true,
+        required: false,
     },
     edition: String,
     editionYear: Number,
-    numberOfPages: { type: Number, required: true },
+    // numberOfPages: { type: Number, required: true },
+    numberOfPages: { type: Number, required: false },
     country: { type: String, required: true },
     language: { type: String, required: true },
     isbn: String,
@@ -96,7 +102,7 @@ const specificationSchema = new mongoose_1.Schema({
 }, { _id: false });
 // BookInfo Schema
 const bookInfoSchema = new mongoose_1.Schema({
-    specification: { type: specificationSchema, required: true },
+    specification: { type: specificationSchema, required: false },
     format: {
         type: String,
         enum: ["hardcover", "paperback", "ebook", "audiobook"],
@@ -115,7 +121,7 @@ const productSchema = new mongoose_1.Schema({
     description: { type: descriptionSchema, required: true },
     productType: { type: String, enum: ["simple", "variable"], required: true },
     productInfo: { type: productInfoSchema, required: true },
-    bookInfo: { type: bookInfoSchema, required: true },
+    bookInfo: { type: bookInfoSchema },
     averageRating: { type: Number, default: 0 },
     ratingCount: { type: Number, default: 0 },
     reviewCount: { type: Number, default: 0 },

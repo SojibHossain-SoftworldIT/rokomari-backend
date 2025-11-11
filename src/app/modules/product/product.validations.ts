@@ -112,6 +112,7 @@ export const createProductZodSchema = z.object({
 
   categoryAndTags: z.object({
     categories: z.array(z.string()),
+    subCategories: z.array(z.string()).optional(),
     tags: z.array(z.string()).optional(),
   }),
 

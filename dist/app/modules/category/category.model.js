@@ -8,6 +8,20 @@ const iconSchema = new mongoose_1.Schema({
 }, { _id: false } // Prevents creating a separate _id for icon
 );
 const categorySchema = new mongoose_1.Schema({
+    mainCategory: {
+        type: String,
+        enum: [
+            "book",
+            "electronics",
+            "superstore",
+            "kids-zone",
+            "corporate-order",
+            "best-seller-award",
+            "offer",
+            "just-for-you",
+        ],
+        required: [true, "Category must have a main category!"],
+    },
     name: {
         type: String,
         required: [true, "Category can't create without a name!"],
@@ -18,6 +32,10 @@ const categorySchema = new mongoose_1.Schema({
     details: {
         type: String,
         required: [true, "Category need a description!"],
+    },
+    feautured: {
+        type: Boolean,
+        default: false,
     },
     icon: iconSchema,
     image: {

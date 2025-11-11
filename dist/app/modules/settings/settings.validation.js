@@ -48,6 +48,7 @@ exports.createSettingsValidationSchema = zod_1.z.object({
                 .optional(),
         })
             .optional(),
+        deliveryCharge: zod_1.z.number().optional(),
         contactAndSocial: zod_1.z
             .object({
             address: zod_1.z.string().optional(),

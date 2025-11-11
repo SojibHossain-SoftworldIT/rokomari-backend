@@ -63,7 +63,8 @@ const getAllProductFromDB = async (query: Record<string, unknown>) => {
     ProductModel.find()
       .populate("categoryAndTags.publisher")
       .populate("categoryAndTags.categories")
-      .populate("categoryAndTags.tags"),
+      .populate("categoryAndTags.tags")
+      .populate("bookInfo.specification.authors"),
     query
   )
     .search(ProductSearchableFields)
@@ -113,6 +114,14 @@ const getProductsByCategoryandTag = async (category: string, tag: string) => {
       },
     },
     {
+      $lookup: {
+        from: "authors",
+        localField: "bookInfo.specification.authors",
+        foreignField: "_id",
+        as: "authorsDetails",
+      },
+    },
+    {
       $addFields: {
         categoryAndTags: {
           publisher: { $arrayElemAt: ["$publisherDetails", 0] },
@@ -144,7 +153,8 @@ const getSingleProductFromDB = async (id: string) => {
   return ProductModel.findById(id)
     .populate("categoryAndTags.publisher")
     .populate("categoryAndTags.categories")
-    .populate("categoryAndTags.tags");
+    .populate("categoryAndTags.tags")
+    .populate("bookInfo.specification.authors");
 };
 
 const updateProductOnDB = async (
@@ -288,6 +298,30 @@ const searchProductsFromDB = async (query: string) => {
   return partialMatch;
 };
 
+const getProductsByAuthorFromDB = async (
+  authorId: string,
+  query: Record<string, unknown>
+) => {
+  const productQuery = new QueryBuilder(
+    ProductModel.find({
+      "bookInfo.specification.authors": authorId,
+    })
+      .populate("categoryAndTags.categories")
+      .populate("categoryAndTags.tags")
+      .populate("bookInfo.specification.authors"),
+    query
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const data = await productQuery.modelQuery;
+  const meta = await productQuery.countTotal();
+
+  return { meta, data };
+};
+
 export const productServices = {
   createProductOnDB,
   getAllProductFromDB,
@@ -296,4 +330,5 @@ export const productServices = {
   getProductsByCategoryandTag,
   getSingleProductFromDB,
   updateProductOnDB,
+  getProductsByAuthorFromDB,
 };

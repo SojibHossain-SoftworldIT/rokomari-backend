@@ -12,6 +12,7 @@ const category_validations_1 = require("./category.validations");
 const router = express_1.default.Router();
 router.get("/", category_controller_1.categoryControllers.getAllCategory);
 router.get("/:id", category_controller_1.categoryControllers.getSingleCategory);
+router.get("/featured-categories", category_controller_1.categoryControllers.getFeauturedCategories);
 router.post("/create-category", multer_config_1.multerUpload.fields([
     { name: "imageFile", maxCount: 1 },
     { name: "bannerImgFile", maxCount: 1 },
