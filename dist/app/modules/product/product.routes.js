@@ -12,6 +12,7 @@ const product_validations_1 = require("./product.validations");
 const router = express_1.default.Router();
 router.get("/", product_controller_1.productControllers.getAllProduct);
 router.get("/search", product_controller_1.productControllers.searchProducts);
+router.get("/popular-products", product_controller_1.productControllers.getPopularProducts);
 router.get("/:id", product_controller_1.productControllers.getSingleProduct);
 router.get("/products/by", product_controller_1.productControllers.getProductsByCategoryandTag);
 router.get("/by-author/:authorId", product_controller_1.productControllers.getProductsByAuthor);

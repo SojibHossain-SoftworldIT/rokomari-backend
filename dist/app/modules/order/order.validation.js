@@ -22,9 +22,7 @@ const totalAmountZodSchema = zod_1.z.object({
     subTotal: zod_1.z.number({
         error: (issue) => issue.input === undefined ? "SubTotal is required!" : "Must be a number!",
     }),
-    tax: zod_1.z.number({
-        error: (issue) => issue.input === undefined ? "Tax is required!" : "Must be a number!",
-    }),
+    tax: zod_1.z.number().optional().default(0),
     shipping: shippingZodSchema,
     discount: zod_1.z.number({
         error: (issue) => issue.input === undefined ? "Discount is required!" : "Must be a number!",

@@ -251,20 +251,59 @@ const searchProductsFromDB = (query) => __awaiter(void 0, void 0, void 0, functi
         .populate("categoryAndTags.publisher");
     return partialMatch;
 });
-const getProductsByAuthorFromDB = (authorId, query) => __awaiter(void 0, void 0, void 0, function* () {
-    const productQuery = new QueryBuilder_1.default(product_model_1.ProductModel.find({
-        "bookInfo.specification.authors": authorId,
+const getPopularProductsFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    const productQuery = new QueryBuilder_1.default(product_model_1.ProductModel.find({ soldCount: { $gt: 0 } })
+        .populate({
+        path: "categoryAndTags.categories",
+        select: "mainCategory name slug details icon image bannerImg subCategories",
     })
-        .populate("categoryAndTags.categories")
-        .populate("categoryAndTags.tags")
-        .populate("bookInfo.specification.authors"), query)
+        .populate({
+        path: "categoryAndTags.tags",
+        select: "name slug details icon image",
+    })
+        .populate({
+        path: "productInfo.brand",
+        select: "name logo slug",
+    })
+        .populate({
+        path: "bookInfo.specification.authors",
+        select: "name image description",
+    })
+        .sort({ soldCount: -1 }), query)
         .filter()
-        .sort()
         .paginate()
         .fields();
     const data = yield productQuery.modelQuery;
     const meta = yield productQuery.countTotal();
-    return { meta, data };
+    return {
+        meta,
+        data,
+    };
+});
+const getProductsByAuthorFromDB = (authorId, query) => __awaiter(void 0, void 0, void 0, function* () {
+    const productQuery = new QueryBuilder_1.default(product_model_1.ProductModel.find({ "bookInfo.specification.authors": authorId })
+        .populate({
+        path: "categoryAndTags.categories",
+        select: "mainCategory name slug details icon image bannerImg subCategories",
+    })
+        .populate({
+        path: "categoryAndTags.tags",
+        select: "name slug details icon image",
+    })
+        .populate({
+        path: "productInfo.brand",
+        select: "name logo slug",
+    })
+        .populate({
+        path: "bookInfo.specification.authors",
+        select: "name image description",
+    }), query);
+    const data = yield productQuery.modelQuery;
+    const meta = yield productQuery.countTotal();
+    return {
+        meta,
+        data,
+    };
 });
 exports.productServices = {
     createProductOnDB,
@@ -274,5 +313,6 @@ exports.productServices = {
     getProductsByCategoryandTag,
     getSingleProductFromDB,
     updateProductOnDB,
+    getPopularProductsFromDB,
     getProductsByAuthorFromDB,
 };

@@ -1,5 +1,6 @@
 import httpStatus from "http-status";
 import { nanoid } from "nanoid";
+import mongoose from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/handleAppError";
 import { ProductModel } from "../product/product.model";
@@ -270,12 +271,35 @@ const getSingleOrderFromDB = async (id: string) => {
 };
 
 const createOrderIntoDB = async (payload: TOrder) => {
-  if (payload) {
-    payload.orderInfo.forEach((order) => (order.trackingNumber = nanoid()));
+  const session = await mongoose.startSession();
+  
+  try {
+    session.startTransaction();
+    
+    if (payload) {
+      payload.orderInfo.forEach((order) => (order.trackingNumber = nanoid()));
+    }
+    
+    // Create the order
+    const result = await OrderModel.create([payload], { session });
+    
+    // Update soldCount for each product in the order
+    for (const orderInfo of payload.orderInfo) {
+      await ProductModel.findByIdAndUpdate(
+        orderInfo.productInfo,
+        { $inc: { soldCount: orderInfo.quantity } },
+        { session }
+      );
+    }
+    
+    await session.commitTransaction();
+    return result[0];
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
   }
-  const result = await OrderModel.create(payload);
-
-  return result;
 };
 
 const updateOrderInDB = async (id: string, payload: Partial<TOrder>) => {

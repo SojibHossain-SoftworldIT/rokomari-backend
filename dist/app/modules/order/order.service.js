@@ -15,8 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.orderServices = exports.OrderServices = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const nanoid_1 = require("nanoid");
+const mongoose_1 = __importDefault(require("mongoose"));
 const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const handleAppError_1 = __importDefault(require("../../errors/handleAppError"));
+const product_model_1 = require("../product/product.model");
 const order_consts_1 = require("./order.consts");
 const order_model_1 = require("./order.model");
 const getAllOrdersFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
@@ -35,7 +37,67 @@ const getAllOrdersFromDB = (query) => __awaiter(void 0, void 0, void 0, function
         data,
     };
 });
+// const recentlyOrderedProductsFromDB = async () => {
+//   // Aggregate orders to find recently ordered products
+//   const recentOrders = await OrderModel.aggregate([
+//     { $unwind: "$orderInfo" },
+//     { $sort: { "orderInfo.orderDate": -1 } },
+//     {
+//       $group: {
+//         _id: "$orderInfo.productInfo",
+//         lastOrderedDate: { $first: "$orderInfo.orderDate" },
+//       },
+//     },
+//     { $sort: { lastOrderedDate: -1 } },
+//     { $limit: 12 }, // Get top 12 recently ordered products
+//   ]);
+//   // Extract product IDs
+//   const productIds = recentOrders.map((order) => order._id);
+//   return productIds;
+// };
 //get my orders
+const recentlyOrderedProductsFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
+    // 🔹 Step 1: Aggregate to get recent product IDs from orders
+    const recentOrders = yield order_model_1.OrderModel.aggregate([
+        { $unwind: "$orderInfo" },
+        { $sort: { "orderInfo.orderDate": -1 } },
+        {
+            $group: {
+                _id: "$orderInfo.productInfo", // store productId
+                lastOrderedDate: { $first: "$orderInfo.orderDate" },
+            },
+        },
+        { $sort: { lastOrderedDate: -1 } },
+        { $limit: 12 },
+    ]);
+    // 🔹 Step 2: Extract product IDs
+    const productIds = recentOrders.map((order) => order._id);
+    if (!productIds.length)
+        return [];
+    // 🔹 Step 3: Fetch products with full population
+    const products = yield product_model_1.ProductModel.find({ _id: { $in: productIds } })
+        .populate({
+        path: "categoryAndTags.categories",
+        select: "mainCategory name slug details icon image bannerImg subCategories",
+    })
+        .populate({
+        path: "categoryAndTags.tags",
+        select: "name slug details icon image",
+    })
+        .populate({
+        path: "productInfo.brand",
+        select: "name logo slug",
+    })
+        .populate({
+        path: "bookInfo.specification.authors",
+        select: "name image description",
+    })
+        .lean()
+        .exec();
+    // 🔹 Step 4: Sort products in the same order as recentOrders
+    const sortedProducts = productIds.map((id) => products.find((p) => p._id.toString() === id.toString()));
+    return sortedProducts.filter(Boolean);
+});
 const getMyOrdersFromDB = (customerId, query) => __awaiter(void 0, void 0, void 0, function* () {
     const orderQuery = new QueryBuilder_1.default(order_model_1.OrderModel.find({ "orderInfo.orderBy": customerId }), // ✅ fixed
     query)
@@ -167,11 +229,28 @@ const getSingleOrderFromDB = (id) => __awaiter(void 0, void 0, void 0, function*
     return result;
 });
 const createOrderIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    if (payload) {
-        payload.orderInfo.forEach((order) => (order.trackingNumber = (0, nanoid_1.nanoid)()));
+    const session = yield mongoose_1.default.startSession();
+    try {
+        session.startTransaction();
+        if (payload) {
+            payload.orderInfo.forEach((order) => (order.trackingNumber = (0, nanoid_1.nanoid)()));
+        }
+        // Create the order
+        const result = yield order_model_1.OrderModel.create([payload], { session });
+        // Update soldCount for each product in the order
+        for (const orderInfo of payload.orderInfo) {
+            yield product_model_1.ProductModel.findByIdAndUpdate(orderInfo.productInfo, { $inc: { soldCount: orderInfo.quantity } }, { session });
+        }
+        yield session.commitTransaction();
+        return result[0];
     }
-    const result = yield order_model_1.OrderModel.create(payload);
-    return result;
+    catch (error) {
+        yield session.abortTransaction();
+        throw error;
+    }
+    finally {
+        session.endSession();
+    }
 });
 const updateOrderInDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const isExist = yield order_model_1.OrderModel.findById(id);
@@ -212,6 +291,7 @@ exports.orderServices = {
     updateOrderInDB,
     getOrderSummaryFromDB,
     getOrderByTrackingNumberFromDB,
+    recentlyOrderedProductsFromDB,
     getMyOrdersFromDB,
     getOrderRangeSummaryFromDB,
     changeOrderStatusInDB,

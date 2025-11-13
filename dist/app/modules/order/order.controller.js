@@ -38,6 +38,15 @@ const getMyOrders = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
         data: result,
     });
 }));
+const recentlyOrderedProducts = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield order_service_1.orderServices.recentlyOrderedProductsFromDB();
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Recently ordered products retrieved successfully!",
+        data: result,
+    });
+}));
 const getSingleOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const result = yield order_service_1.orderServices.getSingleOrderFromDB(id);
@@ -122,6 +131,7 @@ exports.orderControllers = {
     updateOrder,
     getMyOrders,
     getOrderSummary,
+    recentlyOrderedProducts,
     getOrderByTrackingNumber,
     getOrderRangeSummary,
     changeOrderStatus,

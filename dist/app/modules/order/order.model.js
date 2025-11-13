@@ -22,7 +22,8 @@ const totalAmountSchema = new mongoose_1.Schema({
     },
     tax: {
         type: Number,
-        required: [true, "Tax is required!"],
+        default: 0,
+        // required: [true, "Tax is required!"],
     },
     shipping: {
         type: shippingSchema,

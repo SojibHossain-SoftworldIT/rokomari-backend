@@ -298,28 +298,75 @@ const searchProductsFromDB = async (query: string) => {
   return partialMatch;
 };
 
-const getProductsByAuthorFromDB = async (
-  authorId: string,
-  query: Record<string, unknown>
-) => {
+const getPopularProductsFromDB = async (query: Record<string, unknown>) => {
   const productQuery = new QueryBuilder(
-    ProductModel.find({
-      "bookInfo.specification.authors": authorId,
-    })
-      .populate("categoryAndTags.categories")
-      .populate("categoryAndTags.tags")
-      .populate("bookInfo.specification.authors"),
+    ProductModel.find({ soldCount: { $gt: 0 } })
+      .populate({
+        path: "categoryAndTags.categories",
+        select:
+          "mainCategory name slug details icon image bannerImg subCategories",
+      })
+      .populate({
+        path: "categoryAndTags.tags",
+        select: "name slug details icon image",
+      })
+      .populate({
+        path: "productInfo.brand",
+        select: "name logo slug",
+      })
+      .populate({
+        path: "bookInfo.specification.authors",
+        select: "name image description",
+      })
+      .sort({ soldCount: -1 }),
     query
   )
     .filter()
-    .sort()
     .paginate()
     .fields();
 
   const data = await productQuery.modelQuery;
   const meta = await productQuery.countTotal();
 
-  return { meta, data };
+  return {
+    meta,
+    data,
+  };
+};
+
+const getProductsByAuthorFromDB = async (
+  authorId: string,
+  query: Record<string, unknown>
+) => {
+  const productQuery = new QueryBuilder(
+    ProductModel.find({ "bookInfo.specification.authors": authorId })
+      .populate({
+        path: "categoryAndTags.categories",
+        select:
+          "mainCategory name slug details icon image bannerImg subCategories",
+      })
+      .populate({
+        path: "categoryAndTags.tags",
+        select: "name slug details icon image",
+      })
+      .populate({
+        path: "productInfo.brand",
+        select: "name logo slug",
+      })
+      .populate({
+        path: "bookInfo.specification.authors",
+        select: "name image description",
+      }),
+    query
+  );
+
+  const data = await productQuery.modelQuery;
+  const meta = await productQuery.countTotal();
+
+  return {
+    meta,
+    data,
+  };
 };
 
 export const productServices = {
@@ -330,5 +377,6 @@ export const productServices = {
   getProductsByCategoryandTag,
   getSingleProductFromDB,
   updateProductOnDB,
+  getPopularProductsFromDB,
   getProductsByAuthorFromDB,
 };
