@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createOrderZodSchema = void 0;
+exports.changeOrderStatusZodSchema = exports.createOrderZodSchema = void 0;
 const zod_1 = require("zod");
 // ObjectId validation
 const objectIdSchema = zod_1.z
@@ -22,9 +22,7 @@ const totalAmountZodSchema = zod_1.z.object({
     subTotal: zod_1.z.number({
         error: (issue) => issue.input === undefined ? "SubTotal is required!" : "Must be a number!",
     }),
-    tax: zod_1.z.number({
-        error: (issue) => issue.input === undefined ? "Tax is required!" : "Must be a number!",
-    }),
+    tax: zod_1.z.number().optional().default(0),
     shipping: shippingZodSchema,
     discount: zod_1.z.number({
         error: (issue) => issue.input === undefined ? "Discount is required!" : "Must be a number!",
@@ -100,11 +98,7 @@ const paymentInfoZodSchema = zod_1.z.union([
 ]);
 // Order Info Validation
 const orderInfoZodSchema = zod_1.z.object({
-    orderBy: objectIdSchema.or(zod_1.z.string({
-        error: (issue) => issue.input === undefined
-            ? "OrderBy is required!"
-            : "Must be a valid ObjectId string!",
-    })),
+    orderBy: objectIdSchema.or(zod_1.z.string().optional()),
     productInfo: objectIdSchema.or(zod_1.z.string({
         error: (issue) => issue.input === undefined
             ? "Product info is required!"
@@ -146,4 +140,14 @@ exports.createOrderZodSchema = zod_1.z.object({
             ? "Total amount is required!"
             : "Must be a number!",
     }),
+});
+exports.changeOrderStatusZodSchema = zod_1.z.object({
+    status: zod_1.z.enum([
+        "pending",
+        "processing",
+        "at-local-facility",
+        "out-for-delivery",
+        "cancelled",
+        "completed",
+    ], { message: "Invalid order status!" }),
 });

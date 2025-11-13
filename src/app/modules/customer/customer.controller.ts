@@ -40,7 +40,6 @@ const createCustomer = catchAsync(async (req, res) => {
 
 const updateCustomer = catchAsync(async (req, res) => {
   const customerId = req.params.id;
-  console.log(customerId);
   const result = await customerServices.updateCustomerOnDB(
     customerId,
     req.body

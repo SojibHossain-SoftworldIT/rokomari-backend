@@ -36,6 +36,15 @@ const getSingleCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void
         data: result,
     });
 }));
+const getFeauturedCategories = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield category_service_1.categoryServices.feauturedCategoriesFromDB();
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Feautured categories retrieved successfully!",
+        data: result,
+    });
+}));
 // const createCategory = catchAsync(async (req, res) => {
 //   const files =
 //     (req.files as { [fieldname: string]: Express.Multer.File[] }) || {};
@@ -158,6 +167,7 @@ const deleteCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
 exports.categoryControllers = {
     getAllCategory,
     getSingleCategory,
+    getFeauturedCategories,
     createCategory,
     updateCategory,
     deleteCategory,

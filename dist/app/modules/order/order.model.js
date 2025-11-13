@@ -22,7 +22,8 @@ const totalAmountSchema = new mongoose_1.Schema({
     },
     tax: {
         type: Number,
-        required: [true, "Tax is required!"],
+        default: 0,
+        // required: [true, "Tax is required!"],
     },
     shipping: {
         type: shippingSchema,
@@ -67,11 +68,10 @@ const orderInfoSchema = new mongoose_1.Schema({
     orderBy: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "customer",
-        required: true,
     },
     productInfo: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: "product",
+        ref: "Product",
         required: true,
     },
     trackingNumber: {

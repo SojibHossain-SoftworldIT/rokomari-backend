@@ -36,6 +36,7 @@ const categoryAndTagsSchema = new Schema<TCategoriesAndTags>(
       { type: Schema.Types.ObjectId, ref: "category", required: true },
     ],
     tags: [{ type: Schema.Types.ObjectId, ref: "tag", required: true }],
+    subCategories: [String],
   },
   { _id: false }
 );
@@ -114,11 +115,12 @@ const specificationSchema = new Schema<TSpecification>(
     authors: { type: [Schema.Types.ObjectId], ref: "Author", required: true },
     publisher: {
       type: String,
-      required: true,
+      required: false,
     },
     edition: String,
     editionYear: Number,
-    numberOfPages: { type: Number, required: true },
+    // numberOfPages: { type: Number, required: true },
+    numberOfPages: { type: Number, required: false },
     country: { type: String, required: true },
     language: { type: String, required: true },
     isbn: String,
@@ -153,7 +155,7 @@ const productSchema = new Schema<TProduct>(
     description: { type: descriptionSchema, required: true },
     productType: { type: String, enum: ["simple", "variable"], required: true },
     productInfo: { type: productInfoSchema, required: true },
-    bookInfo: { type: bookInfoSchema, required: true },
+    bookInfo: { type: bookInfoSchema },
     averageRating: { type: Number, default: 0 },
     ratingCount: { type: Number, default: 0 },
     reviewCount: { type: Number, default: 0 },

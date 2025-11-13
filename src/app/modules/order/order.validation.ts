@@ -175,3 +175,17 @@ export const createOrderZodSchema = z.object({
         : "Must be a number!",
   }),
 });
+
+export const changeOrderStatusZodSchema = z.object({
+  status: z.enum(
+    [
+      "pending",
+      "processing",
+      "at-local-facility",
+      "out-for-delivery",
+      "cancelled",
+      "completed",
+    ],
+    { message: "Invalid order status!" }
+  ),
+});

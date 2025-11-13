@@ -69,8 +69,25 @@ const updateReview = catchAsync(async (req, res) => {
   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
   const updatedData: any = { ...req.body };
 
-  if (files?.photos?.length) {
-    updatedData.photos = files.photos.map((f) => f.path);
+  // if (files?.photos?.length) {
+  //   updatedData.photos = files.photos.map((f) => f.path);
+  // }
+
+  // Handle gallery images
+  if (files["photos"]?.length) {
+    const newPhotosImages = files["photos"].map((f) => f.path);
+    // Merge with existing gallery images (if provided)
+    updatedData.photos = Array.isArray(updatedData.photos)
+      ? [...updatedData.photos, ...newPhotosImages]
+      : newPhotosImages;
+  } else if (updatedData.photos) {
+    try {
+      updatedData.photos = Array.isArray(updatedData.photos)
+        ? updatedData.photos
+        : JSON.parse(updatedData.photos);
+    } catch {
+      updatedData.photos = [updatedData.photos];
+    }
   }
 
   const result = await reviewServices.updateReviewOnDB(id, updatedData);

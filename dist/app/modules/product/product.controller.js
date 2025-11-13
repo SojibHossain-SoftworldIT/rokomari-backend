@@ -23,7 +23,8 @@ const getAllProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
         success: true,
         statusCode: http_status_1.default.OK,
         message: "Products retrieve successfully!",
-        data: result,
+        data: result.data,
+        meta: result.meta,
     });
 }));
 const getProductsByCategoryandTag = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -73,6 +74,16 @@ const createProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
             : req.body.gallery || [], previewImg: files["previewImgFile"]
             ? files["previewImgFile"].map((f) => f.path)
             : req.body.previewImg || [] });
+    // ✅ Handle author images dynamically
+    // if (req.body.bookInfo?.specification?.authors) {
+    //   productData.bookInfo.specification.authors =
+    //     req.body.bookInfo?.specification?.authors.map(
+    //       (author: any, index: number) => ({
+    //         ...author,
+    //         image: files[`authorImage_${index}`]?.[0]?.path || author.image || "",
+    //       })
+    //     );
+    // }
     const result = yield product_service_1.productServices.createProductOnDB(productData);
     (0, sendResponse_1.default)(res, {
         success: true,
@@ -120,32 +131,74 @@ const updateProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
         updatedData.featuredImg = req.body.featuredImg;
     }
     // ✅ Safely handle gallery
+    // if (files["galleryImagesFiles"]?.length) {
+    //   updatedData.gallery = files["galleryImagesFiles"].map((f) => f.path);
+    // } else if (req.body.gallery) {
+    //   // Handle JSON array (stringified or real array)
+    //   try {
+    //     updatedData.gallery = Array.isArray(req.body.gallery)
+    //       ? req.body.gallery
+    //       : JSON.parse(req.body.gallery);
+    //   } catch {
+    //     updatedData.gallery = [req.body.gallery];
+    //   }
+    // }
+    // // ✅ Safely handle preview images
+    // if (files["previewImgFile"]?.length) {
+    //   updatedData.previewImg = files["previewImgFile"].map((f) => f.path);
+    // } else if (req.body.previewImg) {
+    //   try {
+    //     updatedData.previewImg = Array.isArray(req.body.previewImg)
+    //       ? req.body.previewImg
+    //       : JSON.parse(req.body.previewImg);
+    //   } catch {
+    //     updatedData.previewImg = [req.body.previewImg];
+    //   }
+    // }
+    // // ✅ Handle author images update
+    // if (updatedData.bookInfo?.specification?.authors) {
+    //   updatedData.bookInfo.specification.authors =
+    //     updatedData.bookInfo.specification.authors.map(
+    //       (author: any, index: number) => ({
+    //         ...author,
+    //         image: files[`authorImage_${index}`]?.[0]?.path || author.image || "",
+    //       })
+    //     );
+    // }
+    // Handle gallery images
     if ((_c = files["galleryImagesFiles"]) === null || _c === void 0 ? void 0 : _c.length) {
-        updatedData.gallery = files["galleryImagesFiles"].map((f) => f.path);
+        const newGalleryImages = files["galleryImagesFiles"].map((f) => f.path);
+        // Merge with existing gallery images (if provided)
+        updatedData.gallery = Array.isArray(updatedData.gallery)
+            ? [...updatedData.gallery, ...newGalleryImages]
+            : newGalleryImages;
     }
-    else if (req.body.gallery) {
-        // Handle JSON array (stringified or real array)
+    else if (updatedData.gallery) {
         try {
-            updatedData.gallery = Array.isArray(req.body.gallery)
-                ? req.body.gallery
-                : JSON.parse(req.body.gallery);
+            updatedData.gallery = Array.isArray(updatedData.gallery)
+                ? updatedData.gallery
+                : JSON.parse(updatedData.gallery);
         }
         catch (_e) {
-            updatedData.gallery = [req.body.gallery];
+            updatedData.gallery = [updatedData.gallery];
         }
     }
-    // ✅ Safely handle preview images
+    // Handle preview images
     if ((_d = files["previewImgFile"]) === null || _d === void 0 ? void 0 : _d.length) {
-        updatedData.previewImg = files["previewImgFile"].map((f) => f.path);
+        const newPreviewImages = files["previewImgFile"].map((f) => f.path);
+        // Merge with existing preview images (if provided)
+        updatedData.previewImg = Array.isArray(updatedData.previewImg)
+            ? [...updatedData.previewImg, ...newPreviewImages]
+            : newPreviewImages;
     }
-    else if (req.body.previewImg) {
+    else if (updatedData.previewImg) {
         try {
-            updatedData.previewImg = Array.isArray(req.body.previewImg)
-                ? req.body.previewImg
-                : JSON.parse(req.body.previewImg);
+            updatedData.previewImg = Array.isArray(updatedData.previewImg)
+                ? updatedData.previewImg
+                : JSON.parse(updatedData.previewImg);
         }
         catch (_f) {
-            updatedData.previewImg = [req.body.previewImg];
+            updatedData.previewImg = [updatedData.previewImg];
         }
     }
     const result = yield product_service_1.productServices.updateProductOnDB(id, updatedData);
@@ -178,6 +231,27 @@ const searchProducts = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+const getPopularProducts = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield product_service_1.productServices.getPopularProductsFromDB(req.query);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Popular products retrieved successfully!",
+        data: result.data,
+        meta: result.meta,
+    });
+}));
+const getProductsByAuthor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const authorId = req.params.authorId;
+    const result = yield product_service_1.productServices.getProductsByAuthorFromDB(authorId, req.query);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Products by author retrieved successfully!",
+        data: result.data,
+        meta: result.meta,
+    });
+}));
 exports.productControllers = {
     createProduct,
     getSingleProduct,
@@ -186,4 +260,6 @@ exports.productControllers = {
     getAllProduct,
     updateProduct,
     getProductsByCategoryandTag,
+    getPopularProducts,
+    getProductsByAuthor,
 };

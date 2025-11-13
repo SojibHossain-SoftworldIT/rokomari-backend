@@ -22,7 +22,7 @@ function main() {
         try {
             yield mongoose_1.default.connect(config_1.default.database_url);
             server = app_1.default.listen(port, () => {
-                console.log(`Example app listening on port ${port}`);
+                console.log(`Rokomari Backend Server listening on port ${port}`);
             });
         }
         catch (err) {
