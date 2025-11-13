@@ -230,6 +230,18 @@ const searchProducts = catchAsync(async (req, res) => {
   });
 });
 
+const getPopularProducts = catchAsync(async (req, res) => {
+  const result = await productServices.getPopularProductsFromDB(req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Popular products retrieved successfully!",
+    data: result.data,
+    meta: result.meta,
+  });
+});
+
 export const productControllers = {
   createProduct,
   getSingleProduct,
@@ -238,4 +250,5 @@ export const productControllers = {
   getAllProduct,
   updateProduct,
   getProductsByCategoryandTag,
+  getPopularProducts,
 };

@@ -33,7 +33,8 @@ const totalAmountSchema = new Schema<TTotalAmount>(
     },
     tax: {
       type: Number,
-      required: [true, "Tax is required!"],
+      default: 0,
+      // required: [true, "Tax is required!"],
     },
     shipping: {
       type: shippingSchema,

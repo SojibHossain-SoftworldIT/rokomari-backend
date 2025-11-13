@@ -288,6 +288,41 @@ const searchProductsFromDB = async (query: string) => {
   return partialMatch;
 };
 
+const getPopularProductsFromDB = async (query: Record<string, unknown>) => {
+  const productQuery = new QueryBuilder(
+    ProductModel.find({ soldCount: { $gt: 0 } })
+      .populate({
+        path: "categoryAndTags.categories",
+        select: "mainCategory name slug details icon image bannerImg subCategories",
+      })
+      .populate({
+        path: "categoryAndTags.tags",
+        select: "name slug details icon image",
+      })
+      .populate({
+        path: "productInfo.brand",
+        select: "name logo slug",
+      })
+      .populate({
+        path: "bookInfo.specification.authors",
+        select: "name image description",
+      })
+      .sort({ soldCount: -1 }),
+    query
+  )
+    .filter()
+    .paginate()
+    .fields();
+
+  const data = await productQuery.modelQuery;
+  const meta = await productQuery.countTotal();
+
+  return {
+    meta,
+    data,
+  };
+};
+
 export const productServices = {
   createProductOnDB,
   getAllProductFromDB,
@@ -296,4 +331,5 @@ export const productServices = {
   getProductsByCategoryandTag,
   getSingleProductFromDB,
   updateProductOnDB,
+  getPopularProductsFromDB,
 };
