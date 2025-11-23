@@ -77,6 +77,8 @@ const settingsSchema = new Schema<TSettings>(
       youtubeUrl: { type: [String] },
       whatsappLink: { type: [String] },
     },
+
+    welcomeMessage: { type: String },
   },
   { timestamps: true }
 );

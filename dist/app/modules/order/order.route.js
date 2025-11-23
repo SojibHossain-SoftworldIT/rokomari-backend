@@ -11,6 +11,7 @@ const order_validation_1 = require("./order.validation");
 const router = express_1.default.Router();
 router.get("/", order_controller_1.orderControllers.getAllOrder);
 router.get("/order-summary", order_controller_1.orderControllers.getOrderSummary);
+router.get("/recently-sold-products", order_controller_1.orderControllers.recentlyOrderedProducts);
 router.get("/order-range-summary", order_controller_1.orderControllers.getOrderRangeSummary);
 router.get("/my-order/:id", order_controller_1.orderControllers.getMyOrders);
 router.get("/:id", order_controller_1.orderControllers.getSingleOrder);
