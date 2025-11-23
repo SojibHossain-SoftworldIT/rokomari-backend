@@ -56,5 +56,6 @@ const settingsSchema = new mongoose_1.Schema({
         youtubeUrl: { type: [String] },
         whatsappLink: { type: [String] },
     },
+    welcomeMessage: { type: String },
 }, { timestamps: true });
 exports.SettingsModel = (0, mongoose_1.model)("Settings", settingsSchema);

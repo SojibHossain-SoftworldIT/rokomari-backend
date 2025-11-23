@@ -55,4 +55,6 @@ export type TSettings = {
     youtubeUrl?: string[];
     whatsappLink?: string[];
   };
+
+  welcomeMessage?: string;
 };

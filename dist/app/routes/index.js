@@ -15,6 +15,8 @@ const steadfast_routes_1 = require("../modules/courier/steadfast.routes");
 const customer_route_1 = require("../modules/customer/customer.route");
 const dashboard_routes_1 = require("../modules/dashboard/dashboard.routes");
 const faq_route_1 = require("../modules/faq/faq.route");
+const footer_settings_routes_1 = require("../modules/footer-settings/footer-settings.routes");
+const dynamic_pages_routes_1 = require("../modules/dynamic-pages/dynamic-pages.routes");
 const order_route_1 = require("../modules/order/order.route");
 const orderStatus_route_1 = require("../modules/orderStatus/orderStatus.route");
 const product_routes_1 = require("../modules/product/product.routes");
@@ -150,6 +152,14 @@ const moduleRoutes = [
     {
         path: "/steadfast",
         route: steadfast_routes_1.steadfastRoutes,
+    },
+    {
+        path: "/footer-settings",
+        route: footer_settings_routes_1.footerSettingsRoutes,
+    },
+    {
+        path: "/dynamic-pages",
+        route: dynamic_pages_routes_1.dynamicPagesRoutes,
     },
 ];
 moduleRoutes.forEach((route) => router.use(route === null || route === void 0 ? void 0 : route.path, route === null || route === void 0 ? void 0 : route.route));

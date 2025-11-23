@@ -10,6 +10,8 @@ import { steadfastRoutes } from "../modules/courier/steadfast.routes";
 import { CustomerRoutes } from "../modules/customer/customer.route";
 import { DashboardRoutes } from "../modules/dashboard/dashboard.routes";
 import { FaqRoutes } from "../modules/faq/faq.route";
+import { footerSettingsRoutes } from "../modules/footer-settings/footer-settings.routes";
+import { dynamicPagesRoutes } from "../modules/dynamic-pages/dynamic-pages.routes";
 import { OrderRoutes } from "../modules/order/order.route";
 import { OrderStatusRoutes } from "../modules/orderStatus/orderStatus.route";
 import { ProductRoutes } from "../modules/product/product.routes";
@@ -147,6 +149,14 @@ const moduleRoutes = [
   {
     path: "/steadfast",
     route: steadfastRoutes,
+  },
+  {
+    path: "/footer-settings",
+    route: footerSettingsRoutes,
+  },
+  {
+    path: "/dynamic-pages",
+    route: dynamicPagesRoutes,
   },
 ];
 

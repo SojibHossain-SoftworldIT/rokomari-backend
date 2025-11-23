@@ -8,9 +8,9 @@ const router = express.Router();
 
 router.get("/", categoryControllers.getAllCategory);
 
-router.get("/:id", categoryControllers.getSingleCategory);
-
 router.get("/featured-categories", categoryControllers.getFeauturedCategories);
+
+router.get("/:id", categoryControllers.getSingleCategory);
 
 router.post(
   "/create-category",
